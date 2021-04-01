@@ -4,15 +4,10 @@ import numpy as np
 from scipy.optimize import minimize
 from sklearn.neighbors import KDTree
 from markevaluate.Utilities import Utilities
+from markevaluate.Estimate import Estimate
 
+class Capture(Estimate):
 
-class Capture:
-    
-
-    def __init__(self, set0 : set, set1 : set, k : int) -> None:
-        self.set0 : set = set0
-        self.set1 : set = set1
-        self.k : int = k
 
 
     def capture_total(self) -> int:
@@ -40,6 +35,7 @@ class Capture:
         #         l1 = len(k_nearest_neighbors_1)
         #         acc += Utilities.is_in_hypersphere(s0, k_nearest_neighbors_1, self.k) + l1
         return acc
+
 
 
     def maximize_likelihood(self, n : int = 10e10) -> float:
