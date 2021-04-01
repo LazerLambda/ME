@@ -3,7 +3,7 @@ import numpy as np
 
 from scipy.optimize import minimize
 from sklearn.neighbors import KDTree
-from markevaluate.Utilities import Utilities
+from markevaluate.Utilities import Utilities as ut
 from markevaluate.Estimate import Estimate
 
 class Capture(Estimate):
@@ -19,21 +19,10 @@ class Capture(Estimate):
         acc : int = 0
         for s1 in self.set1:
             for s0 in self.set0:
-                k_nearest_neighbors_0 : np.ndarray = Utilities.k_nearest_neighbor_set(s0, np.asarray(list(self.set0)), kdt0, self.k, point_in_data=True)
-                k_nearest_neighbors_1 : np.ndarray = Utilities.k_nearest_neighbor_set(s1, np.asarray(list(self.set1)), kdt1, self.k, point_in_data=True)
-                acc += Utilities.is_in_hypersphere(s1, k_nearest_neighbors_0, self.k) + len(k_nearest_neighbors_0) + \
-                        Utilities.is_in_hypersphere(s0, k_nearest_neighbors_1, self.k) + len(k_nearest_neighbors_1)
-        # for s1 in list(self.set1):
-        #     for s0 in list(self.set0):
-        #         k_nearest_neighbors_0 : np.ndarray = Utilities.k_nearest_neighbor_set(s0, np.asarray(list(self.set0)), kdt0, self.k, point_in_data=True)
-        #         l0 = len(k_nearest_neighbors_0)
-        #         f0 = Utilities.is_in_hypersphere(s1, k_nearest_neighbors_0, self.k)
-        #         acc += f0 + l0
-        # for s1 in list(self.set1):
-        #     for s0 in list(self.set0):
-        #         k_nearest_neighbors_1 : np.ndarray = Utilities.k_nearest_neighbor_set(s1, np.asarray(list(self.set1)), kdt1, self.k, point_in_data=True)
-        #         l1 = len(k_nearest_neighbors_1)
-        #         acc += Utilities.is_in_hypersphere(s0, k_nearest_neighbors_1, self.k) + l1
+                k_nearest_neighbors_0 : np.ndarray = ut.k_nearest_neighbor_set(s0, np.asarray(list(self.set0)), kdt0, self.k)
+                k_nearest_neighbors_1 : np.ndarray = ut.k_nearest_neighbor_set(s1, np.asarray(list(self.set1)), kdt1, self.k)
+                acc += ut.is_in_hypersphere(s1, k_nearest_neighbors_0, self.k) + len(k_nearest_neighbors_0) + \
+                        ut.is_in_hypersphere(s0, k_nearest_neighbors_1, self.k) + len(k_nearest_neighbors_1)
         return acc
 
 

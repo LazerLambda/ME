@@ -10,12 +10,12 @@ class Peterson(Estimate):
 
 
     def mark(self) -> int:
-        return len(self.set0) + sum([ut.is_in_hypersphere(elem, self.set0, self.k) for elem in self.set1])
+        return len(self.set0) + sum([ut.is_in_hypersphere(elem, np.asarray(list(self.set0)), self.k) for elem in self.set1])
 
 
 
     def capture(self) -> int:
-        return len(self.set1) + sum([ut.is_in_hypersphere(elem, self.set1, self.k) for elem in self.set0])
+        return len(self.set1) + sum([ut.is_in_hypersphere(elem, np.asarray(list(self.set1)), self.k) for elem in self.set0])
 
 
 
