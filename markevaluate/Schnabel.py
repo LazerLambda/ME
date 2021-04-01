@@ -3,15 +3,10 @@ import numpy as np
 
 from sklearn.neighbors import KDTree
 from markevaluate.Utilities import Utilities as ut
+from markevaluate.Estimate import Estimate
 
 
-class Schnabel:
-
-    def __init__(self, set0 : set, set1 : set, k : int) -> None:
-
-        self.set0 : set = set0
-        self.set1 : set = set1
-        self.k = k
+class Schnabel(Estimate):
 
 
 
@@ -21,8 +16,8 @@ class Schnabel:
 
         for s1 in set1_nparr[:t]:
 
-            k_nearest_neighbors : np.ndarray = ut.k_nearest_neighbor_set(s1, set1_nparr, kdt, self.k)
-            set_tmp = set_tmp.union({tuple(elem) for elem in k_nearest_neighbors})
+            knns : np.ndarray = ut.k_nearest_neighbor_set(s1, set1_nparr, kdt, self.k)
+            set_tmp = set_tmp.union({tuple(elem) for elem in knns})
 
         return set_tmp
 
@@ -49,32 +44,31 @@ class Schnabel:
         for s1 in self.set1:
             for s0 in self.set0:
                 knns : np.ndarray = ut.k_nearest_neighbor_set(s1, np.asarray(list(self.set1)), kdt, self.k)
-                acc += ut.is_in_hypersphere(s0, knns, k=self.k)
+                acc += ut.is_in(s0, knns)
         return acc
 
 
 
-    def capture(self, set0 : set, set1 : set) -> int:
+    def capture(self) -> int:
         
-        kdt : KDTree = KDTree(np.asarray(list(set1)), metric='euclidean')
+        kdt : KDTree = KDTree(np.asarray(list(self.set1)), metric='euclidean')
         return (self.k + 1) * len(self.set1) + self.capture_sum(kdt)
 
 
 
     def recapture(self) -> int:
         # O(n^3)s
-        kdt : KDTree = KDTree(np.asarray(list(set1)), metric='euclidean')
+        kdt : KDTree = KDTree(np.asarray(list(self.set1)), metric='euclidean')
         acc : int = 0
         for index, s1 in enumerate(self.set1):
+            knns = ut.k_nearest_neighbor_set(s1, np.asarray(list(self.set1)), kdt, self.k)
             for s0 in self.set0:
-                knns = ut.k_nearest_neighbor_set(s1, np.asarray(list(self.set1)), kdt, self.k)
-                acc += ut.is_in_hypersphere(s0, knns, self.k) + \
-                    len(self.mark(index).intersection(set(knns)))
+                acc += ut.is_in(s0, knns) + len(self.mark(index).intersection(set({tuple(elem) for elem in knns})))
         return acc
         
 
 
-    def estimate(self, set0 : set, set1 : set, k : int) -> float:
+    def estimate(self) -> float:
 
-        return self.capture(set0, set1) * len(set0.union(set1)) / self.recapture(set0, set1)
+        return self.capture() * len(set0.union(set1)) / self.recapture()
  
