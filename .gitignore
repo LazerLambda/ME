@@ -1,5 +1,5 @@
 .vscode
-tests/__pychache__
-markevaluate/__pycache__
+tests/__pychache__/
+markevaluate/__pycache__/
 .ipynb_checkpoints
 .pytest_cache
