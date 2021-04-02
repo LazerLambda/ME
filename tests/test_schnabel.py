@@ -90,12 +90,3 @@ class TestSchnabel(unittest.TestCase):
 
         test_sn = sn.Schnabel(set0, set1, k)
         self.assertEqual(test_sn.recapture(), len(arr) * len(arr) * (k + 1) + len(arr) * (k + 1))
-
-    # def test_schnabel3(self):
-    #     s_len = 5
-    #     k = 2
-    #     arr = np.random.rand(s_len, 2)
-    #     set0 = {tuple(elem) for elem in arr}
-    #     set1 = {tuple(elem) for elem in arr}
-    #     test_sn = sn.Schnabel(set0, set1, k)
-    #     self.assertEqual(test_sn.recapture(set0, set1), s_len * 2 * (k + 1))

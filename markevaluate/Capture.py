@@ -19,10 +19,10 @@ class Capture(Estimate):
         acc : int = 0
         for s1 in self.set1:
             for s0 in self.set0:
-                k_nearest_neighbors_0 : np.ndarray = ut.k_nearest_neighbor_set(s0, np.asarray(list(self.set0)), kdt0, self.k)
-                k_nearest_neighbors_1 : np.ndarray = ut.k_nearest_neighbor_set(s1, np.asarray(list(self.set1)), kdt1, self.k)
-                acc += ut.is_in_hypersphere(s1, k_nearest_neighbors_0, self.k) + len(k_nearest_neighbors_0) + \
-                        ut.is_in_hypersphere(s0, k_nearest_neighbors_1, self.k) + len(k_nearest_neighbors_1)
+                knns0 : np.ndarray = ut.k_nearest_neighbor_set(s0, np.asarray(list(self.set0)), kdt0, self.k)
+                knns1 : np.ndarray = ut.k_nearest_neighbor_set(s1, np.asarray(list(self.set1)), kdt1, self.k)
+                acc += ut.is_in(s1, knns0) + len(knns0) + \
+                        ut.is_in(s0, knns1) + len(knns1)
         return acc
 
 
@@ -33,11 +33,10 @@ class Capture(Estimate):
         t : int = len(self.set0.union(self.set1))
         def neg_likelihood(p):
             return -(\
-                np.log(np.math.factorial(p) / np.math.factorial(p - m_t)) + \
-                c_t * np.log(c_t) + \
-                (t * p - c_t) * np.log(t * p - c_t) - \
-                t * p * np.log(t * p) \
+                np.log(np.math.factorial(p) / np.math.factorial(p - m_t)) #+ \
+                # c_t * np.log(c_t) + \
+                # (t * p - c_t) * np.log(t * p - c_t) - \
+                # t * p * np.log(t * p) \
                 )
-        # TODO: n or 0
         max_val : int = minimize(neg_likelihood, [0], method="nelder-mead", options={'xatol':1e-8, }) 
         return max_val
