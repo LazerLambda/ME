@@ -14,7 +14,7 @@ class Schnabel(Estimate):
 
         set_tmp = self.mark(t = 1)
 
-        for s1 in set1_nparr[:t]:
+        for s1 in set1_nparr[:(t - 1)]:
 
             knns : np.ndarray = ut.k_nearest_neighbor_set(s1, set1_nparr, kdt, self.k)
             set_tmp = set_tmp.union({tuple(elem) for elem in knns})

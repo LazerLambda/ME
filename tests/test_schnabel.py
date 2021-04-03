@@ -54,6 +54,7 @@ class TestSchnabel(unittest.TestCase):
         self.assertEqual(test_sn.capture_sum(kdt), (k + 1) * s_len)
 
     def test_schnabel4(self):
+        ## PROBLEM
         s_len = 5 
         k = 2
 
@@ -77,10 +78,11 @@ class TestSchnabel(unittest.TestCase):
         test_sn = sn.Schnabel(set0, set1, k)
 
         maximum = len(arr0) + sum([ut.Utilities.is_in_hypersphere(elem, arr0, k = k) for elem in arr1]) + t
-        self.assertLessEqual(len(test_sn.mark(t)), maximum)
+        self.assertLessEqual(len(test_sn.mark(t)), maximum, msg="Test cardinality of mark function, t != 1 and t != T")
 
         
     def test_schnabel6(self):
+        ## PROBLEM
         s_len = 6 
         k = 2
 
@@ -89,4 +91,4 @@ class TestSchnabel(unittest.TestCase):
         set1 = {tuple(elem) for elem in arr}
 
         test_sn = sn.Schnabel(set0, set1, k)
-        self.assertEqual(test_sn.recapture(), len(arr) * len(arr) * (k + 1) + len(arr) * (k + 1))
+        self.assertEqual(test_sn.recapture(), len(arr) * len(arr) * (k + 1) + len(arr) * (k + 1), msg="Test recatpture function")

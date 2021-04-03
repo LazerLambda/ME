@@ -1,7 +1,11 @@
 import itertools
+import math
 import numpy as np
+import pandas as pd
+import sys
 
-from scipy.optimize import minimize
+from scipy.optimize import minimize_scalar, OptimizeResult
+from scipy.special import factorial
 from sklearn.neighbors import KDTree
 from markevaluate.Utilities import Utilities as ut
 from markevaluate.Estimate import Estimate
@@ -27,16 +31,53 @@ class Capture(Estimate):
 
 
 
-    def maximize_likelihood(self, n : int = 10e10) -> float:
+    def maximize_likelihood(self, n : int = 10e2) -> float:
+
         m_t : int = len(self.set0.union(self.set1))
         c_t : int = self.capture_total()
         t : int = len(self.set0.union(self.set1))
-        def neg_likelihood(p):
-            return -(\
-                np.log(np.math.factorial(p) / np.math.factorial(p - m_t)) #+ \
-                # c_t * np.log(c_t) + \
-                # (t * p - c_t) * np.log(t * p - c_t) - \
-                # t * p * np.log(t * p) \
+
+        def likelihood(p):
+            
+            def log_factorial(x : int) -> int:
+                # loop = lambda x, acc, counter : loop(x, (acc + math.log(counter)), (counter + 1)) if counter < x + 1 else acc
+                # return loop(x, 0, 1)
+                acc : int = 0
+                for e in np.arange(1, (x + 1)):
+                    acc += np.log(e)
+                return acc
+
+            return (\
+                log_factorial(p) - log_factorial((p - m_t)) + \
+                c_t * np.log(c_t) + \
+                (t * p - c_t) * np.log(t * p - c_t) - \
+                t * p * np.log(t * p) \
                 )
-        max_val : int = minimize(neg_likelihood, [0], method="nelder-mead", options={'xatol':1e-8, }) 
-        return max_val
+
+        # lower_bound : int = m_t
+        # optim_result : OptimizeResult = minimize_scalar(neg_likelihood, bounds = (lower_bound, sys.maxsize), method = 'bounded', options={'maxiter' : 500, 'disp': True})
+        
+        # max_val : int = -1
+        
+        # if optim_result.success:
+        #     max_val = int(optim_result.x) # ceiling fct ?
+        # else:
+        #     # No termination
+        #     print(optim_result.message)
+
+
+
+        ## PROBLEM
+        min_val : int = m_t if m_t > c_t else c_t
+
+        x : np.ndarray = np.arange(start = min_val, stop = n, dtype = int)
+        x : pd.core.frame.Series= pd.Series(x).astype(int)
+        y : np.ndarray = x.map(likelihood).to_numpy()
+        result : int = x[np.argmax(y)]
+
+        return result
+
+
+
+    def estimate(self) -> int:
+        return 0
