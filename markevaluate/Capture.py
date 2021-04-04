@@ -25,17 +25,18 @@ class Capture(Estimate):
             for s0 in self.set0:
                 knns0 : np.ndarray = ut.k_nearest_neighbor_set(s0, np.asarray(list(self.set0)), kdt0, self.k)
                 knns1 : np.ndarray = ut.k_nearest_neighbor_set(s1, np.asarray(list(self.set1)), kdt1, self.k)
-                acc += ut.is_in(s1, knns0) + len(knns0) + \
-                        ut.is_in(s0, knns1) + len(knns1)
+                acc += ut.is_in(s1, knns0) + ut.is_in(s0, knns1)
+            acc += len(knns0) + len(knns1)
         return acc
 
 
 
     def maximize_likelihood(self, n : int = 10e2) -> float:
 
-        m_t : int = len(self.set0.union(self.set1))
+        ## OWN ASUMPTIONS
+        m_t : int = len(self.set0) + len(self.set1) #len(self.set0.union(self.set1))
         c_t : int = self.capture_total()
-        t : int = len(self.set0.union(self.set1))
+        t : int = len(self.set0) + len(self.set1) # len(self.set0.union(self.set1))
 
         def likelihood(p):
             
@@ -68,7 +69,7 @@ class Capture(Estimate):
 
 
         ## PROBLEM
-        min_val : int = m_t if m_t > c_t else c_t
+        min_val : int = m_t # if m_t > c_t else c_t
 
         x : np.ndarray = np.arange(start = min_val, stop = n, dtype = int)
         x : pd.core.frame.Series= pd.Series(x).astype(int)
@@ -80,4 +81,4 @@ class Capture(Estimate):
 
 
     def estimate(self) -> int:
-        return 0
+        return int(self.maximize_likelihood())

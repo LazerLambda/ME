@@ -39,7 +39,7 @@ class Schnabel(Estimate):
 
 
     def capture_sum(self, kdt : KDTree) -> int:
-        # O(n^3)
+        # O(n^2 * n^(1 - 1 / k) * k)
         acc : int = 0
         for s1 in self.set1:
             for s0 in self.set0:
@@ -63,12 +63,12 @@ class Schnabel(Estimate):
         for index, s1 in enumerate(self.set1):
             knns = ut.k_nearest_neighbor_set(s1, np.asarray(list(self.set1)), kdt, self.k)
             for s0 in self.set0:
-                acc += ut.is_in(s0, knns) + len(self.mark(index).intersection(set({tuple(elem) for elem in knns})))
+                acc += ut.is_in(s0, knns)
+            acc += len(self.mark(index).intersection(set({tuple(elem) for elem in knns})))
         return acc
         
 
 
     def estimate(self) -> float:
-
-        return self.capture() * len(set0.union(set1)) / self.recapture()
+        return self.capture() * len(self.set0.union(self.set1)) / self.recapture()
  

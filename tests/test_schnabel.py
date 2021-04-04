@@ -64,7 +64,7 @@ class TestSchnabel(unittest.TestCase):
         kdt : KDTree = KDTree(arr, metric='euclidean')
 
         test_sn = sn.Schnabel(set0, set1, k)
-        self.assertEqual(test_sn.capture_sum(kdt), (k + 1) * s_len)
+        self.assertEqual(test_sn.capture(), (k + 1) * s_len * 2, msg="Test capture sum")
 
     def test_schnabel5(self):
         s_len = 5 
@@ -91,4 +91,18 @@ class TestSchnabel(unittest.TestCase):
         set1 = {tuple(elem) for elem in arr}
 
         test_sn = sn.Schnabel(set0, set1, k)
-        self.assertEqual(test_sn.recapture(), len(arr) * len(arr) * (k + 1) + len(arr) * (k + 1), msg="Test recatpture function")
+        self.assertEqual(test_sn.recapture(), len(arr) * (k + 1) * 2, msg="Test recatpture function")
+
+    
+    def test_schnabel7(self):
+
+        ## PROBLEM
+        s_len = 6 
+        k = 2
+
+        arr = np.random.rand(s_len, 2)
+        set0 = {tuple(elem) for elem in arr}
+        set1 = {tuple(elem) for elem in arr}
+
+        test_sn = sn.Schnabel(set0, set1, k)
+        self.assertEqual(test_sn.estimate(), s_len) #2 * s_len)
