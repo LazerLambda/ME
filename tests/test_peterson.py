@@ -26,8 +26,8 @@ class TestPeterson(unittest.TestCase):
     
     def test_peterson2(self):
 
-        s0_len = random.randrange(4, 100) #10e2)
-        s1_len = random.randrange(4, 100) #10e2)
+        s0_len = random.randrange(4, 10) #10e2)
+        s1_len = random.randrange(4, 10) #10e2)
         rand_dim = random.randrange(1, 20)
         k = 2
 
@@ -42,8 +42,9 @@ class TestPeterson(unittest.TestCase):
 
     def test_peterson3(self):
 
-        s0_len = random.randrange(4, 10e2)
-        s1_len = random.randrange(4, 10e2)
+        # PERFORMANCE
+        s0_len = random.randrange(4, 100)
+        s1_len = random.randrange(4, 100)
         rand_dim = random.randrange(1, 20)
         k = 2
 

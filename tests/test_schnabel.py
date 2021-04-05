@@ -133,7 +133,7 @@ class TestSchnabel(unittest.TestCase):
 
         test_sn = sn.Schnabel(set0, set1, k)
         # kdt1 = kdt0
-        self.assertEqual(test_sn.recapture(kdt0=kdt0, kdt1=kdt0), len(arr) * (k + 1) * 2, msg="Test recatpture function")
+        self.assertEqual(test_sn.recapture(kdt0=kdt0, kdt1=kdt0), len(arr) * (k + 1) * 2, msg="Test recapture function")
 
     
     def test_schnabel9(self):
