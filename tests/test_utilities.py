@@ -34,7 +34,9 @@ class TestUtilities(unittest.TestCase):
         k = 2
         arr = np.random.rand(s_len, 2)
 
-        self.assertEqual(ut.Utilities.is_in_hypersphere(arr[0], arr, k), True)
+        kdt = KDTree(arr, metric='euclidean')
+
+        self.assertEqual(ut.Utilities.is_in_hypersphere(arr[0], arr, kdt, k), True)
 
     def test_utilities2(self):
         s_len = 6
@@ -46,4 +48,6 @@ class TestUtilities(unittest.TestCase):
         i, j = np.unravel_index(dist_mat.argmax(), dist_mat.shape)
         dist = np.linalg.norm(candidates[i] - candidates[j])
         new_point = 2 * dist + candidates[i]
-        self.assertEqual(ut.Utilities.is_in_hypersphere(new_point, arr, k), False)
+        kdt = KDTree(arr, metric='euclidean')
+
+        self.assertEqual(ut.Utilities.is_in_hypersphere(new_point, arr, kdt, k), False)

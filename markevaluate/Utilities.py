@@ -8,8 +8,8 @@ class Utilities:
 
 
     @staticmethod
-    def is_in_hypersphere(elem : tuple, sample: np.ndarray, k : int) -> int:
-        kdt : KDTree = KDTree(sample, metric='euclidean')
+    def is_in_hypersphere(elem : tuple, sample: np.ndarray, kdt : KDTree, k : int) -> int:
+
         for s in sample:
             k_nn_dist, _ = kdt.query([s], k= k + 1)
 

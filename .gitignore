@@ -3,3 +3,5 @@ tests/__pycache__/
 markevaluate/__pycache__/
 .ipynb_checkpoints
 .pytest_cache
+me.py.lprof
+profile.txt

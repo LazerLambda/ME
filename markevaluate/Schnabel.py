@@ -10,13 +10,13 @@ class Schnabel(Estimate):
 
 
 
-    def mark_t(self, t : int, set1_nparr : np.ndarray, kdt : KDTree) -> set:
+    def mark_t(self, t : int, set1_nparr : np.ndarray, kdt0 : KDTree, kdt1 : KDTree) -> set:
 
-        set_tmp = self.mark(t = 1)
+        set_tmp = self.mark(t = 1, kdt0 = kdt0, kdt1 = kdt1)
 
         for s1 in set1_nparr[:(t - 1)]:
 
-            knns : np.ndarray = ut.k_nearest_neighbor_set(s1, set1_nparr, kdt, self.k)
+            knns : np.ndarray = ut.k_nearest_neighbor_set(s1, set1_nparr, kdt1, self.k)
             set_tmp = set_tmp.union({tuple(elem) for elem in knns})
 
         return set_tmp
@@ -24,51 +24,51 @@ class Schnabel(Estimate):
 
 
     # T = |S union S'|
-    def mark(self, t : int) -> set:
+    def mark(self, t : int, kdt0 : KDTree, kdt1 : KDTree) -> set:
         
         if t == 1:
             set0_nparr : np.ndarray = np.asarray(list(self.set0))
 
-            return self.set0.union(set([s1 for s1 in self.set1 if ut.is_in_hypersphere(s1, set0_nparr, k=self.k)]))
+            return self.set0.union(set([s1 for s1 in self.set1 if ut.is_in_hypersphere(s1, set0_nparr, kdt0, k=self.k)]))
         else:
             set1_nparr : np.ndarray = np.asarray(list(self.set1))
-            kdt : KDTree = KDTree(set1_nparr, metric='euclidean')
 
-            return self.mark_t(t, set1_nparr, kdt)
+            return self.mark_t(t, set1_nparr, kdt0 , kdt1)
             
 
-
-    def capture_sum(self, kdt : KDTree) -> int:
+    def capture_sum(self, kdt1 : KDTree) -> int:
         # O(n^2 * n^(1 - 1 / k) * k)
         acc : int = 0
         for s1 in self.set1:
             for s0 in self.set0:
-                knns : np.ndarray = ut.k_nearest_neighbor_set(s1, np.asarray(list(self.set1)), kdt, self.k)
+                knns : np.ndarray = ut.k_nearest_neighbor_set(s1, np.asarray(list(self.set1)), kdt1, self.k)
                 acc += ut.is_in(s0, knns)
         return acc
 
 
 
-    def capture(self) -> int:
+    def capture(self, kdt1 : KDTree) -> int:
         
-        kdt : KDTree = KDTree(np.asarray(list(self.set1)), metric='euclidean')
-        return (self.k + 1) * len(self.set1) + self.capture_sum(kdt)
+        return (self.k + 1) * len(self.set1) + self.capture_sum(kdt1)
 
 
 
-    def recapture(self) -> int:
-        # O(n^3)s
-        kdt : KDTree = KDTree(np.asarray(list(self.set1)), metric='euclidean')
+    def recapture(self, kdt0 : KDTree, kdt1 : KDTree) -> int:
+        # O(n^2)s ??
+
         acc : int = 0
         for index, s1 in enumerate(self.set1):
-            knns = ut.k_nearest_neighbor_set(s1, np.asarray(list(self.set1)), kdt, self.k)
+            knns = ut.k_nearest_neighbor_set(s1, np.asarray(list(self.set1)), kdt1, self.k)
             for s0 in self.set0:
                 acc += ut.is_in(s0, knns)
-            acc += len(self.mark(index).intersection(set({tuple(elem) for elem in knns})))
+            acc += len(self.mark(index, kdt0, kdt1).intersection(set({tuple(elem) for elem in knns})))
         return acc
         
 
 
     def estimate(self) -> float:
-        return self.capture() * len(self.set0.union(self.set1)) / self.recapture()
+        kdt0 : KDTree = KDTree(np.asarray(list(self.set0)), metric='euclidean')
+        kdt1 : KDTree = KDTree(np.asarray(list(self.set1)), metric='euclidean')
+
+        return self.capture(kdt1) * (len(self.set0) + len(self.set1)) / self.recapture(kdt0, kdt1)
  

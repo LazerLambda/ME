@@ -35,4 +35,4 @@ class TestCapture(unittest.TestCase):
         set0 = {tuple(elem) for elem in arr}
         set1 = {tuple(elem) for elem in arr}
         test_capture = Capture.Capture(set0, set1, k = k)
-        print(test_capture.maximize_likelihood(), 2 * s_len)
+        # print(test_capture.maximize_likelihood(), 2 * s_len)
