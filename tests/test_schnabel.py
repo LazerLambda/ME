@@ -29,7 +29,7 @@ class TestSchnabel(unittest.TestCase):
         test_sn = sn.Schnabel(set0, set1, k)
         kdt0 = KDTree(arr, metric='euclidean')
         # kdt1 = kdt0
-        self.assertEqual(len(test_sn.mark(1, kdt0, kdt0)), s_len)
+        self.assertEqual(len(test_sn.mark(1, kdt0, kdt0)), s_len, msg="Test if M(1, S, S') retuns S with len(arr)")
 
     def test_schnabel2(self):
         s_len = 5 
