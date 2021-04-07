@@ -32,14 +32,15 @@ class KNneighbors:
 
             self.knns[0][i], self.knns[1][i] = np.asarray(knns_index), np.asarray(knns_dist)
             self.kmaxs[i] = kmax
+        pass
 
 
 
-    def get_knn(index : int) -> np.ndarray:
+    def get_knn(self, index : int) -> np.ndarray:
         return self.knns[0][index], self.knns[1][index]
 
 
 
-    def is_in_hypersphere(index : int, sample : tuple) -> int:
+    def is_in_hypersphere(self, index : int, sample : tuple) -> int:
         dist : float = np.linalg.norm(self.embds[index] - sample)
         return 1 if dist < self.kmaxs[index] else 0
