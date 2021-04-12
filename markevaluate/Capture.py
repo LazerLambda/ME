@@ -7,6 +7,7 @@ import sys
 from scipy.optimize import minimize_scalar, OptimizeResult
 from scipy.special import factorial
 from sklearn.neighbors import KDTree
+from markevaluate.KNneighbors import KNneighbors as knn
 from markevaluate.Utilities import Utilities as ut
 from markevaluate.Estimate import Estimate
 
@@ -18,15 +19,12 @@ class Capture(Estimate):
         # Errorhandling
         if len(self.set0) == 0 or len(self.set1) == 0:
             return 0
-        kdt0 : KDTree = KDTree(np.asarray(list(self.set0)), metric='euclidean')
-        kdt1 : KDTree = KDTree(np.asarray(list(self.set1)), metric='euclidean')
+        knn0 : knn = knn(np.asarray(list(self.set0)), k = self.k)
+        knn1 : knn = knn(np.asarray(list(self.set1)), k = self.k)
         acc : int = 0
-        for s1 in self.set1:
-            for s0 in self.set0:
-                knns0 : np.ndarray = ut.k_nearest_neighbor_set(s0, np.asarray(list(self.set0)), kdt0, self.k)
-                knns1 : np.ndarray = ut.k_nearest_neighbor_set(s1, np.asarray(list(self.set1)), kdt1, self.k)
-                acc += ut.is_in(s1, knns0) + ut.is_in(s0, knns1)
-            acc += len(knns0) + len(knns1)
+        for index1, s1 in enumerate(self.set1):
+            for index0, s0 in enumerate(self.set0):
+                acc += knn0.in_kngbhd(index0, s1) + knn1.in_kngbhd(index1, s0)
         return acc
 
 
@@ -72,9 +70,9 @@ class Capture(Estimate):
         min_val : int = m_t # if m_t > c_t else c_t
 
         x : np.ndarray = np.arange(start = min_val, stop = n, dtype = int)
-        x : pd.core.frame.Series= pd.Series(x).astype(int)
-        y : np.ndarray = x.map(likelihood).to_numpy()
-        result : int = x[np.argmax(y)]
+        x_range : pd.core.frame.Series = pd.Series(x).astype(int)
+        y : np.ndarray = x_range.map(likelihood).to_numpy()
+        result : int = x_range[np.argmax(y)]
 
         return result
 
