@@ -2,6 +2,7 @@ import numpy as np
 
 from sentence_transformers import SentenceTransformer
 from markevaluate.Utilities import Utilities as ut
+from markevaluate.KNneighbors import KNneighbors as knn
 from Capture import Capture
 from Schnabel import Schnabel
 
