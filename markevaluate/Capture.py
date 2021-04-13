@@ -11,11 +11,14 @@ from markevaluate.Utilities import Utilities as ut
 from markevaluate.Estimate import Estimate
 
 class Capture(Estimate):
-
+    """ Computing the ME-CAPTURE-estimator
+    
+    Class to provide the functions to compute the ME-CAPTURE-estimator.
+    """
 
 
     def capture_total(self) -> int:
-        """Capture Total
+        """ Capture Total
 
         "The total number of captures corresponds to the number of samples in S
         and S′and their respectiveneighbors, as well as the number of samples 
@@ -98,4 +101,15 @@ class Capture(Estimate):
 
 
     def estimate(self) -> int:
+        """ Estimate function
+
+        Computes the ME-CAPTURE-estimator.
+
+        Complexity is O(n^2)
+
+        Returns
+        -------
+        float
+            ME-CAPTURE-estimation of the population
+        """
         return int(self.maximize_likelihood())

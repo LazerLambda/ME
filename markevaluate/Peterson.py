@@ -7,26 +7,73 @@ from markevaluate.KNneighbors import KNneighbors as knn
 
 
 class Peterson(Estimate):
+    """ Computing the ME-Peterson-estimator
+    
+    Class to provide the functions to compute the ME-Peterson-estimator.
+    """
+
+    def mark(self) -> int:
+        """ Marking function
+
+        "During the marking step, we mark all samples inside at least one hypersphere of s[...]"
+        Mordido, Meinel, 2020: https://arxiv.org/abs/2010.04606
+
+        Complexity is O(n^2).
+
+        Returns
+        -------
+        int
+            number of marked samples 
+        """
+
+        return len(self.set0) + sum([self.knn0.in_hypsphr(elem) for elem in self.set1])
 
 
-    def mark(self, knn0 : knn) -> int:
-        return len(self.set0) + sum([knn0.in_hypsphr(elem) for elem in self.set1])
+
+    def capture(self) -> int:
+        """ Capture function
+
+        Opposite of the `mark` function. 
+        
+        Complexity is O(n^2).
+
+        Returns
+        -------
+        int
+            number of captured samples 
+        """
+
+        return len(self.set1) + sum([self.knn1.in_hypsphr(elem) for elem in self.set0])
 
 
 
-    def capture(self, knn1 : knn) -> int:
-        return len(self.set1) + sum([knn1.in_hypsphr(elem) for elem in self.set0])
+    def recapture(self) -> int:
+        """ Recapture function
 
+        # TODO
 
+        Returns
+        -------
+        int
+            number of recaptured samples 
+        """
 
-    def recapture(self, knn0 : knn, knn1 : knn) -> int:
-
-        return sum([knn0.in_hypsphr(elem) for elem in self.set1]) + \
-            sum([knn1.in_hypsphr(elem) for elem in self.set0])
+        return sum([self.knn0.in_hypsphr(elem) for elem in self.set1]) + \
+            sum([self.knn1.in_hypsphr(elem) for elem in self.set0])
 
 
 
     def estimate(self) -> float:
-        knn0 : knn = knn(np.asarray(list(self.set0)), k = self.k)
-        knn1 : knn = knn(np.asarray(list(self.set1)), k = self.k)
-        return self.capture(knn1 = knn1) * self.mark(knn0 = knn0) / self.recapture(knn0=knn0, knn1=knn1)
+        """ Estimate function
+
+        Computes the ME-Peterson-estimator.
+
+        Complexity is O(n^2)
+
+        Returns
+        -------
+        float
+            ME-Peterson-estimation of the population
+        """
+
+        return self.capture() * self.mark() / self.recapture()

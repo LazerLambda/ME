@@ -8,9 +8,9 @@ from markevaluate.KNneighbors import KNneighbors as knn
 
 
 class Schnabel(Estimate):
-    """ Computing the Schnabel Estimator
+    """ Computing the ME-Schnabel-estimator
     
-    Class to provide the functions to compute the Schnabel Estimator.
+    Class to provide the functions to compute the ME-Schnabel-estimator.
     """
 
     def mark_t(self, t : int) -> set:
@@ -144,14 +144,14 @@ class Schnabel(Estimate):
     def estimate(self) -> float:
         """ Estimate function
 
-        Computes the Schnabel-Estimator.
+        Computes the ME-Schnabel-estimator.
 
         Complexity is O(n^2)
 
         Returns
         -------
         float
-            Schnabel-Estimation of the population
+            ME-Schnabel-estimation of the population
         """
         return self.capture() * (len(self.set0) + len(self.set1)) / self.recapture()
  
