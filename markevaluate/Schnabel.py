@@ -3,26 +3,41 @@ import numpy as np
 
 from sklearn.neighbors import KDTree
 from markevaluate.Utilities import Utilities as ut
+from markevaluate.Estimate import Estimate
+from markevaluate.KNneighbors import KNneighbors as knn
 
 
-class Schnabel:
+class Schnabel(Estimate):
+    """ Computing the ME-Schnabel-estimator
+    
+    Class to provide the functions to compute the ME-Schnabel-estimator.
+    """
 
-    def __init__(self, set0 : set, set1 : set, k : int) -> None:
+    def mark_t(self, t : int) -> set:
+        """ Marked function for t != T and t !=1
 
-        self.set0 : set = set0
-        self.set1 : set = set1
-        self.k = k
+        Function that captures new samples which are already marked to 
+        the t-th marking step.
 
+        Complexity is O(n) / O(t-1). 
 
+        Parameters
+        ----------
+        t : int
+            t-th marking step
 
-    def mark_t(self, t : int, set1_nparr : np.ndarray, kdt : KDTree) -> set:
+        Returns
+        -------
+        set
+            set of already marked samples
+        """
 
         set_tmp = self.mark(t = 1)
 
-        for s1 in set1_nparr[:t]:
+        for elem in range((t - 1)):
 
-            k_nearest_neighbors : np.ndarray = ut.k_nearest_neighbor_set(s1, set1_nparr, kdt, self.k)
-            set_tmp = set_tmp.union({tuple(elem) for elem in k_nearest_neighbors})
+            knns : set = self.knn1.get_knn_set(elem)
+            set_tmp = set_tmp.union(knns)
 
         return set_tmp
 
@@ -30,51 +45,113 @@ class Schnabel:
 
     # T = |S union S'|
     def mark(self, t : int) -> set:
-        
+        """ Marked function
+
+        Function to get the sets of the already marked samples.
+
+        Complexity is O(n) (function call).
+
+        Parameters
+        ----------
+        t : int
+            t-th marking step
+
+        Returns
+        -------
+        set
+            set of already marked samples
+        """
+
         if t == 1:
-            set0_nparr : np.ndarray = np.asarray(list(self.set0))
-
-            return self.set0.union(set([s1 for s1 in self.set1 if ut.is_in_hypersphere(s1, set0_nparr, k=self.k)]))
+            return self.set0.union({tuple(s1) for s1 in self.knn1.embds if self.knn0.in_hypsphr(tuple(s1)) })
         else:
-            set1_nparr : np.ndarray = np.asarray(list(self.set1))
-            kdt : KDTree = KDTree(set1_nparr, metric='euclidean')
 
-            return self.mark_t(t, set1_nparr, kdt)
+            return self.mark_t(t)
             
 
 
-    def capture_sum(self, kdt : KDTree) -> int:
-        # O(n^3)
+    def capture_sum(self) -> int:
+        """ Capture sum function
+
+        This function is using an indicator function to determine if a sample is inside the k-nearest-neighborhood
+        instead of the binary function (2) to comply with Theorem A.2.
+
+        Complexity is O(n^2).
+
+        Returns
+        -------
+        int 
+            sum of captured samples
+        """
+
         acc : int = 0
-        for s1 in self.set1:
-            for s0 in self.set0:
-                knns : np.ndarray = ut.k_nearest_neighbor_set(s1, np.asarray(list(self.set1)), kdt, self.k)
-                acc += ut.is_in_hypersphere(s0, knns, k=self.k)
+        for index, _ in enumerate(self.knn1.embds):
+            for s0 in self.knn0.embds:
+                acc += self.knn1.in_kngbhd(index=index, sample=s0)
         return acc
 
 
 
-    def capture(self, set0 : set, set1 : set) -> int:
+    def capture(self) -> int:
+        """ Capture function
+
+        "After all recapture steps, which excludes the first marking step, the number of captured samples will 
+        be the number of samples in S′and their respective k’th nearest neighbors as well as samples in S that 
+        are inside the hypersphere of each s′[...]"
+        Mordido, Meinel, 2020: https://arxiv.org/abs/2010.04606
+
+        Complexity is O(n^2) (function call).
+
+        Returns
+        -------
+        int 
+            amount of total captured samples
+        """
         
-        kdt : KDTree = KDTree(np.asarray(list(set1)), metric='euclidean')
-        return (self.k + 1) * len(self.set1) + self.capture_sum(kdt)
+        return (self.k + 1) * len(self.set1) + self.capture_sum()
 
 
 
     def recapture(self) -> int:
-        # O(n^3)s
-        kdt : KDTree = KDTree(np.asarray(list(set1)), metric='euclidean')
+        """ Recapture function
+
+        "Since all samplesinShave been marked in the first marking step, the number of total recaptures is the 
+        number of samples in S inside the hypersphere of each s′as well as the number of k-nearest neighbors 
+        of the iterated s′thathave already been marked[...]"
+        Mordido, Meinel, 2020: https://arxiv.org/abs/2010.04606
+
+        This function is using an indicator function to determine if a sample is inside the k-nearest-neighborhood
+        instead of the binary function (2) to comply with Theorem A.2.
+
+        Complexity is O(n^2).
+
+        Returns
+        -------
+        int
+            total amount of recaptured samples
+
+        """
+
         acc : int = 0
-        for index, s1 in enumerate(self.set1):
-            for s0 in self.set0:
-                knns = ut.k_nearest_neighbor_set(s1, np.asarray(list(self.set1)), kdt, self.k)
-                acc += ut.is_in_hypersphere(s0, knns, self.k) + \
-                    len(self.mark(index).intersection(set(knns)))
+        for index, s1 in enumerate(self.knn1.embds):
+            for s0 in self.knn0.embds:
+                acc += self.knn1.in_kngbhd(index = index, sample = s0)
+            acc += len(self.mark(index).intersection(self.knn1.get_knn_set(index=index)))
         return acc
         
 
 
-    def estimate(self, set0 : set, set1 : set, k : int) -> float:
+    def estimate(self) -> float:
+        """ Estimate function
 
-        return self.capture(set0, set1) * len(set0.union(set1)) / self.recapture(set0, set1)
+        Computes the ME-Schnabel-estimator.
+
+        Complexity is O(n^2)
+
+        Returns
+        -------
+        float
+            ME-Schnabel-estimation of the population
+        """
+        return self.capture() * (len(self.set0) + len(self.set1)) / self.recapture()
  

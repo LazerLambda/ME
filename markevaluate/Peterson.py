@@ -2,26 +2,78 @@ import numpy as np
 
 
 from markevaluate.Utilities import Utilities as ut
+from markevaluate.Estimate import Estimate
+from markevaluate.KNneighbors import KNneighbors as knn
 
 
-
-class Peterson:
-
-    def __init__(self, set0 : set, set1 : set, k : int) -> None:
-        self.set0 : np.ndarray = np.asarray(list(set0))
-        self.set1 : np.ndarray = np.asarray(list(set1))
-        self.k : int = k
-
+class Peterson(Estimate):
+    """ Computing the ME-Peterson-estimator
+    
+    Class to provide the functions to compute the ME-Peterson-estimator.
+    """
 
     def mark(self) -> int:
-        return len(self.set0) + sum([ut.is_in_hypersphere(elem, self.set0, self.k) for elem in self.set1])
+        """ Marking function
+
+        "During the marking step, we mark all samples inside at least one hypersphere of s[...]"
+        Mordido, Meinel, 2020: https://arxiv.org/abs/2010.04606
+
+        Complexity is O(n^2).
+
+        Returns
+        -------
+        int
+            number of marked samples 
+        """
+
+        return len(self.set0) + sum([self.knn0.in_hypsphr(elem) for elem in self.set1])
+
+
 
     def capture(self) -> int:
-        return len(self.set1) + sum([ut.is_in_hypersphere(elem, self.set1, self.k) for elem in self.set0])
+        """ Capture function
+
+        Opposite of the `mark` function. 
+        
+        Complexity is O(n^2).
+
+        Returns
+        -------
+        int
+            number of captured samples 
+        """
+
+        return len(self.set1) + sum([self.knn1.in_hypsphr(elem) for elem in self.set0])
+
+
 
     def recapture(self) -> int:
-        return sum([ut.is_in_hypersphere(elem, np.asarray(list(self.set0)), self.k) for elem in self.set1]) + \
-            sum([ut.is_in_hypersphere(elem, np.asarray(list(self.set1)), self.k) for elem in self.set0])
+        """ Recapture function
+
+        # TODO
+
+        Returns
+        -------
+        int
+            number of recaptured samples 
+        """
+
+        return sum([self.knn0.in_hypsphr(elem) for elem in self.set1]) + \
+            sum([self.knn1.in_hypsphr(elem) for elem in self.set0])
+
+
 
     def estimate(self) -> float:
+        """ Estimate function
+
+        Computes the ME-Peterson-estimator.
+
+        Complexity is O(n^2)
+
+        Returns
+        -------
+        float
+            ME-Peterson-estimation of the population
+        """
+
         return self.capture() * self.mark() / self.recapture()
