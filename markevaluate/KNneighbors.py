@@ -10,6 +10,10 @@ class KNneighbors:
 
         self.embds : np.ndarray = np.asarray(list({tuple(elem) for elem in embds}))
 
+        # new
+        self.knns_dist : np.ndarray = np.zeros((len(self.embds), k + 1))
+        self.knns_indx : np.ndarray = np.zeros((len(self.embds), k + 1))
+        
         # dist, index
         self.knns : Tuple[np.ndarray, np.ndarray] = (np.zeros((len(self.embds), k + 1)), np.zeros((len(self.embds), k + 1)))
         self.kmaxs : np.ndarray = np.zeros((len(self.embds), 1))
@@ -21,25 +25,22 @@ class KNneighbors:
             
             knns_dist, knns_indx  = self.kdt.query([self.embds[i]], k = k + 1)
 
-            self.knns[0][i], self.knns[1][i] = knns_dist[0], knns_indx[0]
+            # new
+            self.knns_dist[i] = knns_dist[0]
+            self.knns_indx[i] = knns_indx[0]
+
             self.kmaxs[i] = max(knns_dist[0])
 
 
 
     def in_kngbhd(self, index : int, sample : tuple) -> int:
-        print(self.kmaxs[index], self.knns[0][index])       
-        print(1 if np.linalg.norm(sample - self.embds[index]) <= self.kmaxs[index] else 0)
-        return 1 if np.linalg.norm(sample - self.embds[index]) <= self.kmaxs[index] else 0 
-
-
-
-    def get_knn(self, index : int) -> Tuple[np.ndarray, np.ndarray]:
-        return self.knns[0][index], self.knns[1][index]
+        print(index, np.linalg.norm(sample - self.embds[index]), self.kmaxs[index][0], np.linalg.norm(sample - self.embds[index]) <= self.kmaxs[index][0])
+        return 1 if np.linalg.norm(sample - self.embds[index]) <= self.kmaxs[index][0] else 0 
 
     
 
     def get_knn_set(self, index : int) -> set:
-        return {tuple(elem) for elem in self.embds[self.knns[1][index].astype(int)]}
+        return {tuple(elem) for elem in self.embds[self.knns_indx[index].astype(int)]}
 
 
 

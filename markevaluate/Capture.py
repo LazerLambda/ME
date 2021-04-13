@@ -28,7 +28,7 @@ class Capture(Estimate):
 
         The complexity is O(n^2)
 
-        Returns
+        Returns:
         -------
         int
             total number of captures as described above
@@ -37,12 +37,12 @@ class Capture(Estimate):
         # Errorhandling
         if len(self.set0) == 0 or len(self.set1) == 0:
             return 0
-        knn0 : knn = knn(np.asarray(list(self.set0)), k = self.k)
-        knn1 : knn = knn(np.asarray(list(self.set1)), k = self.k)
+
         acc : int = 0
-        for index1, s1 in enumerate(self.set1):
-            for index0, s0 in enumerate(self.set0):
-                acc += knn0.in_kngbhd(index0, s1) + knn1.in_kngbhd(index1, s0)
+        for index1, s1 in enumerate(self.knn1.embds):
+            for index0, s0 in enumerate(self.knn0.embds):
+                acc += self.knn0.in_kngbhd(index0, s1) + self.knn1.in_kngbhd(index1, s0)
+            acc += 2 * (self.k + 1)
         return acc
 
 
@@ -87,6 +87,7 @@ class Capture(Estimate):
 
         min_val : int = m_t
 
+        # Iterating over integers
         x : np.ndarray = np.arange(start = min_val, stop = n, dtype = int)
         x_range : pd.core.frame.Series = pd.Series(x).astype(int)
         y : np.ndarray = x_range.map(likelihood).to_numpy()

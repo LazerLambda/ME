@@ -38,10 +38,25 @@ class TestKNneighbors(unittest.TestCase):
 
         for i in range(s_len):
             _, kd_index = test_KDTree.query([arr[i]], k + 1)
-            _, knn_index = test_knns.get_knn(i)
-            self.assertTrue((knn_index == kd_index[0]).all())
+            knn_set= test_knns.get_knn_set(i)
+            self.assertTrue((knn_set == {tuple(e) for e in arr[kd_index[0]]}))
 
     def test_knns2(self):
+        s_len = 7
+        k = 2
+        dim = 5
+
+        arr = np.random.rand(s_len, dim)
+
+        test_knns = knn.KNneighbors(arr, k)
+        arr = np.asarray(list({tuple(elem) for elem in arr}))
+        test_KDTree = KDTree(arr, metric="euclidean")
+
+        for i in range(s_len):
+            kd_dist, kd_index = test_KDTree.query([arr[i]], k + 1)
+            self.assertTrue(test_knns.kmaxs[i][0], max(kd_dist[0]))
+
+    def test_knns3(self):
         s_len = 7
         k = 2
         dim = 5
@@ -57,7 +72,7 @@ class TestKNneighbors(unittest.TestCase):
                 test_knns.in_hypsphr(tuple(arr[i])),\
                 self.is_in_hypersphere(tuple(arr[i]), arr, test_KDTree, k))
 
-    def test_knns3(self):
+    def test_knns4(self):
         s_len = 6
         k = 2
         arr = np.random.rand(s_len, 2)
@@ -66,7 +81,7 @@ class TestKNneighbors(unittest.TestCase):
 
         self.assertEqual(test_knns.in_hypsphr(tuple(arr[0])), True)
 
-    def test_knns4(self):
+    def test_knns5(self):
         s_len = 6
         k = 2
         arr = np.random.rand(s_len, 2)
@@ -80,3 +95,35 @@ class TestKNneighbors(unittest.TestCase):
         test_knns = knn.KNneighbors(arr, k)
 
         self.assertEqual(test_knns.in_hypsphr(new_point), False)
+
+    def test_knns6(self):
+        s_len = 7
+        k = 2
+        dim = 5
+
+        arr = np.random.rand(s_len, dim)
+
+        test_knns = knn.KNneighbors(arr, k)
+
+        acc = 0
+        for i, _ in enumerate(test_knns.embds):
+            acc += test_knns.in_kngbhd(index = i, sample=tuple(arr[0]))
+
+        self.assertEqual(acc, (k + 1), msg="Check wether in_kngbhd function returns exactly k + 1 on two equal sets")
+
+    def test_knns7(self):
+        s_len = 7
+        k = 2
+        dim = 5
+
+        arr = np.random.rand(s_len, dim)
+
+        test_knns = knn.KNneighbors(arr, k)
+
+        acc_indx = 0
+        acc_dist = 0
+        for i, _ in enumerate(test_knns.embds):
+            acc_indx += len(test_knns.knns_indx[i])
+            acc_dist += len(test_knns.knns_dist[i])
+
+        self.assertEqual(acc_indx + acc_dist, 2 * s_len * (k + 1), msg="check wether exactly k + 1 indices and distances are been stored.")
