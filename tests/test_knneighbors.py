@@ -107,7 +107,7 @@ class TestKNneighbors(unittest.TestCase):
 
         acc = 0
         for i, _ in enumerate(test_knns.embds):
-            acc += test_knns.in_kngbhd(index = i, sample=tuple(arr[0]))
+            acc += test_knns.in_kngbhd(index = 0, sample=tuple(arr[i]))
 
         self.assertEqual(acc, (k + 1), msg="Check wether in_kngbhd function returns exactly k + 1 on two equal sets")
 

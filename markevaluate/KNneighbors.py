@@ -1,3 +1,4 @@
+import math
 import numpy as np
 import sys
 
@@ -5,19 +6,35 @@ from typing import Tuple
 from sklearn.neighbors import KDTree
 
 class KNneighbors:
+    """Managing k-nearest-neighbors
+
+    class to organize the k-nearest neighbors of each element of the provided set.
+    Performance increase due to just one computation of a KDTree. All necessary
+    values are then stored and can be easily accessed through indexing.
+    """
 
     def __init__(self, embds : np.ndarray, k : int) -> None:
+        """Initializing function
+
+        Building up the datastructure to store the k-nearest-neighbor information.
+        The indices, distances and the most distant distance are stored. Calcuation
+        through a KDTree with euclidean metric.
+
+        Complexity is O(n*log(n)).
+
+        Parameters
+        ----------
+        embds : numpy.ndarray
+            numpy array of sentence of word embeddings
+        k : int
+            integer to determine how many neighbors are to be in the neighborhood
+        """
 
         self.embds : np.ndarray = np.asarray(list({tuple(elem) for elem in embds}))
 
-        # new
         self.knns_dist : np.ndarray = np.zeros((len(self.embds), k + 1))
         self.knns_indx : np.ndarray = np.zeros((len(self.embds), k + 1))
-        
-        # dist, index
-        self.knns : Tuple[np.ndarray, np.ndarray] = (np.zeros((len(self.embds), k + 1)), np.zeros((len(self.embds), k + 1)))
         self.kmaxs : np.ndarray = np.zeros((len(self.embds), 1))
-        self.dst_matrix = np.zeros((len(self.embds), len(self.embds)))
 
         self.kdt : KDTree = KDTree(self.embds, metric='euclidean')
 
@@ -25,21 +42,60 @@ class KNneighbors:
             
             knns_dist, knns_indx  = self.kdt.query([self.embds[i]], k = k + 1)
 
-            # new
             self.knns_dist[i] = knns_dist[0]
             self.knns_indx[i] = knns_indx[0]
-
             self.kmaxs[i] = max(knns_dist[0])
 
 
 
     def in_kngbhd(self, index : int, sample : tuple) -> int:
-        #print(index, np.linalg.norm(sample - self.embds[index]), self.kmaxs[index][0], np.linalg.norm(sample - self.embds[index]) <= self.kmaxs[index][0])
-        return 1 if np.linalg.norm(sample - self.embds[index]) <= self.kmaxs[index][0] else 0 
+        """ In k-nearest-neighborhood function
+
+        Indicatorfunction that determines weather a sample is in the 
+        k-nearest-neighborhood of another a sample. 
+
+        Complexity is O(1).
+
+        Parameters
+        ----------
+        index : int
+            index of the sample which determines the k-nearest-neighborhood
+        sample : tuple
+            sample which is to be determined wether it is in the neighbor
+            hood or not.
+
+        Returns
+        -------
+        int 
+            1 if the sample is in the k-nearest-neighborhood of the sample at index `index`
+            0 if not
+        """
+
+        dist : float = np.linalg.norm(sample - self.embds[index])
+        kmax : float = self.kmaxs[index][0]
+        # due to precision issues
+        return 1 if dist < kmax or math.isclose(dist, kmax) else 0 
 
     
 
     def get_knn_set(self, index : int) -> set:
+        """ Getter function for knn
+
+        Getter function to return a set of the k-nearest-neighbors of sample at `index`.
+        
+        Complexity is O(1).
+
+        Parameters
+        ----------
+        index : int
+            index of the sample
+
+        Returns
+        -------
+        set
+            set of the k-nearest-neighbors
+        """
+
         return {tuple(elem) for elem in self.embds[self.knns_indx[index].astype(int)]}
 
 
@@ -62,8 +118,8 @@ class KNneighbors:
         -------
         int
             1 if the sample is in the k-nearest neighborhood, 0 if not
-
         """
+
         for index, embd in enumerate(self.embds):
 
             dist : float = np.linalg.norm(embd - sample)

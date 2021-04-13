@@ -79,8 +79,9 @@ class TestSchnabel(unittest.TestCase):
         set1 = {tuple(elem) for elem in arr1}
         test_sn = sn.Schnabel(set0, set1, k)
 
-        maximum = len(arr0) + sum([test_sn.knn0.in_hypsphr(elem) for elem in arr1]) + t  #ut.Utilities.is_in_hypersphere(elem, arr0, kdt0, k = k) for elem in arr1]) + t
-        self.assertLessEqual(len(test_sn.mark(t)), maximum, msg="Test cardinality of mark function, t != 1 and t != T")
+        maximum = 2 * s_len
+        marked = len(test_sn.mark(t))
+        self.assertLessEqual(marked, maximum, msg="Test cardinality of mark function, t != 1 and t != T")
 
     
     def test_schnabel6(self):
