@@ -6,7 +6,6 @@ import sys
 
 from scipy.optimize import minimize_scalar, OptimizeResult
 from scipy.special import factorial
-from sklearn.neighbors import KDTree
 from markevaluate.KNneighbors import KNneighbors as knn
 from markevaluate.Utilities import Utilities as ut
 from markevaluate.Estimate import Estimate
@@ -16,6 +15,25 @@ class Capture(Estimate):
 
 
     def capture_total(self) -> int:
+        """Capture Total
+
+        "The total number of captures corresponds to the number of samples in S
+        and S′and their respectiveneighbors, as well as the number of samples 
+        in S inside the hypersphere of a givens′and vice-versa[...]"
+        Mordido, Meinel, 2020: https://arxiv.org/abs/2010.04606
+
+        This function is altered to fit in Theorem A.3. in Mordido and Meinel 2020.
+        The respective cardinality of the k-nearest neighbor set is only iterated
+        in the outer loop.
+
+        The complexity is O(n^2)
+
+        Returns
+        -------
+        int
+            total number of captures as described above
+        """
+
         # Errorhandling
         if len(self.set0) == 0 or len(self.set1) == 0:
             return 0
@@ -30,17 +48,30 @@ class Capture(Estimate):
 
 
     def maximize_likelihood(self, n : int = 10e2) -> float:
+        """ Function that maximes the likelihood
+        
+        In this function the likelihood is defined and also iteratively maximized, starting
+        from len(set0) + len(self.set1) based on the assumption that we have a concatenation here.
+
+        This function is altered to fit in Theorem A.3. in Mordido and Meinel 2020. It is assumed
+        that M_T(S,S') = |S concat S'| instead of |S union S'|
+
+        The complexity is O(n).
+
+        Parameters
+        ----------
+        n : int
+            max iterations
+        """
 
         ## OWN ASUMPTIONS
-        m_t : int = len(self.set0) + len(self.set1) #len(self.set0.union(self.set1))
+        m_t : int = len(self.set0) + len(self.set1)
         c_t : int = self.capture_total()
-        t : int = len(self.set0) + len(self.set1) # len(self.set0.union(self.set1))
+        t : int = len(self.set0) + len(self.set1)
 
         def likelihood(p):
             
             def log_factorial(x : int) -> int:
-                # loop = lambda x, acc, counter : loop(x, (acc + math.log(counter)), (counter + 1)) if counter < x + 1 else acc
-                # return loop(x, 0, 1)
                 acc : int = 0
                 for e in np.arange(1, (x + 1)):
                     acc += np.log(e)
@@ -53,21 +84,8 @@ class Capture(Estimate):
                 t * p * np.log(t * p) \
                 )
 
-        # lower_bound : int = m_t
-        # optim_result : OptimizeResult = minimize_scalar(neg_likelihood, bounds = (lower_bound, sys.maxsize), method = 'bounded', options={'maxiter' : 500, 'disp': True})
-        
-        # max_val : int = -1
-        
-        # if optim_result.success:
-        #     max_val = int(optim_result.x) # ceiling fct ?
-        # else:
-        #     # No termination
-        #     print(optim_result.message)
 
-
-
-        ## PROBLEM
-        min_val : int = m_t # if m_t > c_t else c_t
+        min_val : int = m_t
 
         x : np.ndarray = np.arange(start = min_val, stop = n, dtype = int)
         x_range : pd.core.frame.Series = pd.Series(x).astype(int)

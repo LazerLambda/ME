@@ -27,6 +27,8 @@ class KNneighbors:
 
 
     def in_kngbhd(self, index : int, sample : tuple) -> int:
+        print(self.kmaxs[index], self.knns[0][index])       
+        print(1 if np.linalg.norm(sample - self.embds[index]) <= self.kmaxs[index] else 0)
         return 1 if np.linalg.norm(sample - self.embds[index]) <= self.kmaxs[index] else 0 
 
 
