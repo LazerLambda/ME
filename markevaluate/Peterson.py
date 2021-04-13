@@ -3,31 +3,30 @@ import numpy as np
 
 from markevaluate.Utilities import Utilities as ut
 from markevaluate.Estimate import Estimate
-from sklearn.neighbors import KDTree
+from markevaluate.KNneighbors import KNneighbors as knn
 
 
 class Peterson(Estimate):
 
 
-
-    def mark(self, kdt0 : KDTree) -> int:
-        return len(self.set0) + sum([ut.is_in_hypersphere(elem, np.asarray(list(self.set0)), kdt0, self.k) for elem in self.set1])
-
-
-
-    def capture(self, kdt1 : KDTree) -> int:
-        return len(self.set1) + sum([ut.is_in_hypersphere(elem, np.asarray(list(self.set1)), kdt1, self.k) for elem in self.set0])
+    def mark(self, knn0 : knn) -> int:
+        return len(self.set0) + sum([knn0.in_hypsphr(elem) for elem in self.set1])
 
 
 
-    def recapture(self, kdt0 : KDTree, kdt1 : KDTree) -> int:
+    def capture(self, knn1 : knn) -> int:
+        return len(self.set1) + sum([knn1.in_hypsphr(elem) for elem in self.set0])
 
-        return sum([ut.is_in_hypersphere(elem, np.asarray(list(self.set0)), kdt0, self.k) for elem in self.set1]) + \
-            sum([ut.is_in_hypersphere(elem, np.asarray(list(self.set1)), kdt1, self.k) for elem in self.set0])
+
+
+    def recapture(self, knn0 : knn, knn1 : knn) -> int:
+
+        return sum([knn0.in_hypsphr(elem) for elem in self.set1]) + \
+            sum([knn1.in_hypsphr(elem) for elem in self.set0])
 
 
 
     def estimate(self) -> float:
-        kdt0 : KDTree = KDTree(np.asarray(list(self.set0)), metric='euclidean')
-        kdt1 : KDTree = KDTree(np.asarray(list(self.set1)), metric='euclidean')
-        return self.capture(kdt1) * self.mark(kdt0) / self.recapture(kdt0, kdt1)
+        knn0 : knn = knn(np.asarray(list(self.set0)), k = self.k)
+        knn1 : knn = knn(np.asarray(list(self.set1)), k = self.k)
+        return self.capture(knn1 = knn1) * self.mark(knn0 = knn0) / self.recapture(knn0=knn0, knn1=knn1)

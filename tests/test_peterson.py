@@ -38,7 +38,7 @@ class TestPeterson(unittest.TestCase):
         set1 = {tuple(elem) for elem in arr1}
 
         test_pt = pt.Peterson(set0, set1, k)
-        self.assertGreater(test_pt.estimate(), s0_len + s1_len)
+        self.assertGreaterEqual(int(test_pt.estimate()), s0_len + s1_len)
 
     def test_peterson3(self):
 
