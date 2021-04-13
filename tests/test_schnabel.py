@@ -33,126 +33,126 @@ class TestSchnabel(unittest.TestCase):
         # knn1 = knn0
         self.assertEqual(len(test_sn.mark(1)), s_len, msg="Test if M(1, S, S') retuns S with len(arr)")
 
-    # def test_schnabel2(self):
-    #     s_len = 5 
-    #     k = 2
-    #     t = 4
+    def test_schnabel2(self):
+        s_len = 5 
+        k = 2
+        t = 4
 
-    #     arr = np.random.rand(s_len, 2)
-    #     set0 = {tuple(elem) for elem in arr}
-    #     set1 = {tuple(elem) for elem in arr}
-    #     test_sn = sn.Schnabel(set0, set1, k)
+        arr = np.random.rand(s_len, 2)
+        set0 = {tuple(elem) for elem in arr}
+        set1 = {tuple(elem) for elem in arr}
+        test_sn = sn.Schnabel(set0, set1, k)
 
-    #     self.assertEqual(len(test_sn.mark_t(t)), s_len)
+        self.assertEqual(len(test_sn.mark_t(t)), s_len)
 
-    # def test_schnabel3(self):
-    #     s_len = 5 
-    #     k = 0
+    def test_schnabel3(self):
+        s_len = 5 
+        k = 0
 
-    #     arr = np.random.rand(s_len, 2)
-    #     set0 = {tuple(elem) for elem in arr}
-    #     set1 = {tuple(elem) for elem in arr}
+        arr = np.random.rand(s_len, 2)
+        set0 = {tuple(elem) for elem in arr}
+        set1 = {tuple(elem) for elem in arr}
 
-    #     test_sn = sn.Schnabel(set0, set1, k)
-    #     self.assertEqual(test_sn.capture_sum(), (k + 1) * s_len)
+        test_sn = sn.Schnabel(set0, set1, k)
+        self.assertEqual(test_sn.capture_sum(), (k + 1) * s_len)
 
-    # def test_schnabel4(self):
-    #     ## PROBLEM
-    #     s_len = 5 
-    #     k = 2
+    def test_schnabel4(self):
+        ## PROBLEM
+        s_len = 5 
+        k = 2
 
-    #     arr = np.random.rand(s_len, 2)
-    #     set0 = {tuple(elem) for elem in arr}
-    #     set1 = {tuple(elem) for elem in arr}
+        arr = np.random.rand(s_len, 2)
+        set0 = {tuple(elem) for elem in arr}
+        set1 = {tuple(elem) for elem in arr}
 
-    #     test_sn = sn.Schnabel(set0, set1, k)
-    #     self.assertEqual(test_sn.capture(), (k + 1) * s_len * 2, msg="Test capture sum")
+        test_sn = sn.Schnabel(set0, set1, k)
+        self.assertEqual(test_sn.capture(), (k + 1) * s_len * 2, msg="Test capture sum")
 
-    # def test_schnabel5(self):
-    #     s_len = 5 
-    #     k = 2
-    #     t = 3
+    def test_schnabel5(self):
+        s_len = 5 
+        k = 2
+        t = 3
 
-    #     arr0 = np.random.rand(s_len, 2)
-    #     arr1 = np.random.rand(s_len, 2)
-    #     set0 = {tuple(elem) for elem in arr0}
-    #     set1 = {tuple(elem) for elem in arr1}
-    #     test_sn = sn.Schnabel(set0, set1, k)
+        arr0 = np.random.rand(s_len, 2)
+        arr1 = np.random.rand(s_len, 2)
+        set0 = {tuple(elem) for elem in arr0}
+        set1 = {tuple(elem) for elem in arr1}
+        test_sn = sn.Schnabel(set0, set1, k)
 
-    #     maximum = len(arr0) + sum([test_sn.knn0.in_hypsphr(elem) for elem in arr1]) + t  #ut.Utilities.is_in_hypersphere(elem, arr0, kdt0, k = k) for elem in arr1]) + t
-    #     self.assertLessEqual(len(test_sn.mark(t)), maximum, msg="Test cardinality of mark function, t != 1 and t != T")
+        maximum = len(arr0) + sum([test_sn.knn0.in_hypsphr(elem) for elem in arr1]) + t  #ut.Utilities.is_in_hypersphere(elem, arr0, kdt0, k = k) for elem in arr1]) + t
+        self.assertLessEqual(len(test_sn.mark(t)), maximum, msg="Test cardinality of mark function, t != 1 and t != T")
 
     
-    # def test_schnabel6(self):
+    def test_schnabel6(self):
 
-    #     k = 1
+        k = 1
 
-    #     arr0 = np.array([[1,1], [2,2], [3,3]])
-    #     arr1 = np.array([[-3,-3], [-4,-4], [-5,-5]])
-    #     set0 = {tuple(elem) for elem in arr0}
-    #     set1 = {tuple(elem) for elem in arr1}
-    #     test_sn = sn.Schnabel(set0, set1, k)
+        arr0 = np.array([[1,1], [2,2], [3,3]])
+        arr1 = np.array([[-3,-3], [-4,-4], [-5,-5]])
+        set0 = {tuple(elem) for elem in arr0}
+        set1 = {tuple(elem) for elem in arr1}
+        test_sn = sn.Schnabel(set0, set1, k)
 
-    #     self.assertEqual(len(test_sn.mark(1)), len(arr0), msg="test for two distant sets if the knn is correct and no sample from the other set is in the marked sample")
-
-
-    # def test_schnabel7(self):
-
-    #     k = 1
-
-    #     arr0 = np.array([[1,1], [2,2], [3,3]])
-    #     arr1 = np.array([[-3,-3], [-4,-4], [-5,-5]])
-    #     set0 = {tuple(elem) for elem in arr0}
-    #     set1 = {tuple(elem) for elem in arr1}
-    #     test_sn = sn.Schnabel(set0, set1, k)
+        self.assertEqual(len(test_sn.mark(1)), len(arr0), msg="test for two distant sets if the knn is correct and no sample from the other set is in the marked sample")
 
 
-    #     self.assertEqual(len(test_sn.mark(2)), len(arr0) + 2, \
-    #         msg="test for two distant sets if the union in the marking process is correct and if with t = 2 there is only one sample and its first neighbor in the set") 
+    def test_schnabel7(self):
+
+        k = 1
+
+        arr0 = np.array([[1,1], [2,2], [3,3]])
+        arr1 = np.array([[-3,-3], [-4,-4], [-5,-5]])
+        set0 = {tuple(elem) for elem in arr0}
+        set1 = {tuple(elem) for elem in arr1}
+        test_sn = sn.Schnabel(set0, set1, k)
+
+
+        self.assertEqual(len(test_sn.mark(2)), len(arr0) + 2, \
+            msg="test for two distant sets if the union in the marking process is correct and if with t = 2 there is only one sample and its first neighbor in the set") 
 
         
-    # def test_schnabel8(self):
-    #     ## PROBLEM
-    #     ## ERROR
-    #     s_len = 6 
-    #     k = 2
+    def test_schnabel8(self):
+        ## PROBLEM
+        ## ERROR
+        s_len = 6 
+        k = 2
 
-    #     arr = np.random.rand(s_len, 2)
-    #     set0 = {tuple(elem) for elem in arr}
-    #     set1 = {tuple(elem) for elem in arr}
+        arr = np.random.rand(s_len, 2)
+        set0 = {tuple(elem) for elem in arr}
+        set1 = {tuple(elem) for elem in arr}
 
 
-    #     test_sn = sn.Schnabel(set0, set1, k)
-    #     # kdt1 = kdt0
-    #     self.assertEqual(test_sn.recapture(), len(arr) * (k + 1) * 2, msg="Test recapture function")
+        test_sn = sn.Schnabel(set0, set1, k)
+        # kdt1 = kdt0
+        self.assertEqual(test_sn.recapture(), len(arr) * (k + 1) * 2, msg="Test recapture function")
 
     
-    # def test_schnabel9(self):
+    def test_schnabel9(self):
 
-    #     ## PROBLEM
-    #     s_len = 6 
-    #     k = 1
+        ## PROBLEM
+        s_len = 6 
+        k = 1
 
-    #     arr = np.random.rand(s_len, 2)
-    #     set0 = {tuple(elem) for elem in arr}
-    #     set1 = {tuple(elem) for elem in arr}
+        arr = np.random.rand(s_len, 2)
+        set0 = {tuple(elem) for elem in arr}
+        set1 = {tuple(elem) for elem in arr}
 
-    #     test_sn = sn.Schnabel(set0, set1, k)
-    #     self.assertEqual(test_sn.estimate(), 2 * s_len)
+        test_sn = sn.Schnabel(set0, set1, k)
+        self.assertEqual(test_sn.estimate(), 2 * s_len)
 
 
-    # def test_schnabel9(self):
-    #     s_len0 = 10
-    #     s_len1 = 10
-    #     k = 1
+    def test_schnabel9(self):
+        s_len0 = 10
+        s_len1 = 10
+        k = 1
 
-    #     arr0 = np.random.rand(int(s_len0), 2)
-    #     arr1 = np.random.rand(int(s_len1), 2)
-    #     set0 = {tuple(elem) for elem in arr0}
-    #     set1 = {tuple(elem) for elem in arr1}
-    #     test_sn = sn.Schnabel(set0, set1, k)
+        arr0 = np.random.rand(int(s_len0), 2)
+        arr1 = np.random.rand(int(s_len1), 2)
+        set0 = {tuple(elem) for elem in arr0}
+        set1 = {tuple(elem) for elem in arr1}
+        test_sn = sn.Schnabel(set0, set1, k)
 
-    #     self.assertGreaterEqual(test_sn.estimate(), s_len0 + s_len1)
+        self.assertGreaterEqual(test_sn.estimate(), s_len0 + s_len1)
 
 
 if __name__ == '__main__':
