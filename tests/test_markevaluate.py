@@ -12,7 +12,7 @@ from markevaluate import MarkEvaluate
 
 class TestMarkEvaluate(unittest.TestCase):
 
-    sentences0 = ['This framework provides an easy method to compute dense vector representations for sentences0, paragraphs, and images.',\
+    sentences0 = ['This framework provides an easy method to compute dense vector representations for sentences, paragraphs, and images.',\
         'This framework generates embeddings for each input sentence',\
         'sentences0 are passed as a list of string.',\
         'The quick brown fox jumps over the lazy dog.',\
@@ -26,8 +26,7 @@ class TestMarkEvaluate(unittest.TestCase):
         "South Africa has also paused its use, despite the Johnson & Johnson being its preferred vaccine because of its effectiveness against the South African variant",\
         "Both vaccines work by a similar method, known as adenoviral vectors.",\
         "Danish officials said that all 2.4 million doses of the AstraZeneca vaccine would be withdrawn until further notice."]
-
-    sentences2 = []
+    # https://www.bbc.com/news/world-europe-56744474
 
     def test_markevaluate1(self):
 
