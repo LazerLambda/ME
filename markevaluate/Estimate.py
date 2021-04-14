@@ -5,6 +5,11 @@ from markevaluate import KNneighbors as knn
 
 
 class Estimate():
+    """ Parent class for Population Estimators
+    
+    Provides all class variables for children classes to work properly and catches possible
+    Errors at one central point.
+    """
 
 
     def __init__(self, set0 : set, set1 : set, k : int) -> None:

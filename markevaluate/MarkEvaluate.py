@@ -2,13 +2,13 @@ import numpy as np
 
 from sentence_transformers import SentenceTransformer
 from markevaluate.Utilities import Utilities as ut
-from markevaluate.KNneighbors import KNneighbors as knn
-from Capture import Capture
-from Schnabel import Schnabel
+from markevaluate.Peterson import Peterson as pt
+from markevaluate.Schnabel import Schnabel as sn
+from markevaluate.Capture import Capture as cp
 
 class MarkEvaluate:
 
-
+        # 'bert-large-nli-mean-tokens'
 
     def __init__(\
             self,\
@@ -19,37 +19,44 @@ class MarkEvaluate:
             quality : str = "diversity",\
             k : int = 1
             ) -> None:
-        self.cand : str = cand
-        self.ref : str = ref
+
         self.metric : list = metric
         self.sbert_model : SentenceTransformer = SentenceTransformer(sbert_model_str) # CUDA support
         self.k : int = k
+        self.quality : str = quality
+
+        self.cand : np.ndarray = self.get_embds_sbert(cand)
+        self.ref : np.ndarray = self.get_embds_sbert(ref)
+
         self.result : dict = None
 
 
 
-    def get_embeddings(self, input : str) -> np.ndarray:
+    def get_embds_sbert(self, input : list) -> np.ndarray:
         return self.sbert_model.encode(input)
 
 
 
     def peterson(self) -> float:
-        reference : np.ndarray = self.get_embeddings(self.ref)
-        candidate : np.ndarray = self.get_embeddings(self.cand)
-        mc = lambda s_, s : len(s) + sum([ut.is_in_hypersphere(elem, s, k=self.k) for elem in s_])
-        r = lambda s_, s : sum([ut.is_in_hypersphere(elem, s, k=self.k) for elem in s_]) + sum([ut.is_in_hypersphere(elem, s_, k=self.k) for elem in s])
-        return mc(reference, candidate) * mc(candidate, reference) / r(reference, candidate)
+        pt_estim : pt = pt({tuple(elem) for elem in self.cand}, {tuple(elem) for elem in self.ref}, k = self.k)
+        return pt_estim.estimate()
 
 
 
     def schnabel(self, type : str = "quality") -> float:
-        return 0
+
+        if self.quality == "diversity":
+            sn_estim : sn = sn({tuple(elem) for elem in self.cand}, {tuple(elem) for elem in self.ref}, k = self.k)
+            return sn_estim.estimate()
+        else:
+            sn_estim : sn = sn({tuple(elem) for elem in self.ref}, {tuple(elem) for elem in self.cand}, k = self.k)
+            return sn_estim.estimate()
 
 
 
     def capture(self) -> float:
-        return 0
-
+        cp_estim : cp = cp({tuple(elem) for elem in self.cand}, {tuple(elem) for elem in self.ref}, k = self.k)
+        return cp_estim.estimate()
 
 
     def estimate(self) -> dict:
@@ -102,4 +109,29 @@ class MarkEvaluate:
         print(f"{BOLD}https://arxiv.org/abs/2010.04606{ENDC}")
         print("\n")
 
+
+
+    @staticmethod
+    def accuracy_loss(p_hat : int, p : int) -> float:
+        """Accuracy loss function
+
+        Function that returns the accuracy of the population estimate by calculating (p_hat - p) / p,
+        which is furthermore bounded to the top with 1. Complexity is O(1).
         
+        Parameters
+        ----------
+        p_hat: int
+            population estimate
+        p : int
+            real population, known before
+
+        Returns
+        -------
+        float
+            accuracy of estimation
+        """
+
+        if p == 0:
+            return -1
+        a : float = abs((p_hat - p) / p)
+        return 1 if a > 1 else a

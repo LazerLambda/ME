@@ -54,3 +54,6 @@ class TestUtilities(unittest.TestCase):
     #     kdt = KDTree(arr, metric='euclidean')
 
     #     self.assertEqual(ut.Utilities.is_in_hypersphere(new_point, arr, kdt, k), False)
+
+if __name__ == '__main__':
+    unittest.main()

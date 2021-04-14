@@ -1,5 +1,2 @@
 test:
-		pytest -s
-
-prfmc_test:
-		kernprof -l -v me.py
+		python3 -m unittest -v tests/*.py

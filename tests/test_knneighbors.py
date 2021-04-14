@@ -127,3 +127,7 @@ class TestKNneighbors(unittest.TestCase):
             acc_dist += len(test_knns.knns_dist[i])
 
         self.assertEqual(acc_indx + acc_dist, 2 * s_len * (k + 1), msg="check wether exactly k + 1 indices and distances are been stored.")
+
+    
+if __name__ == '__main__':
+    unittest.main()

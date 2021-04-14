@@ -56,3 +56,7 @@ class TestPeterson(unittest.TestCase):
 
         test_pt = pt.Peterson(set0, set1, k)
         self.assertGreaterEqual(int(test_pt.estimate()), s0_len + s1_len)
+
+
+if __name__ == '__main__':
+    unittest.main()
