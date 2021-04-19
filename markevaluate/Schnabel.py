@@ -2,7 +2,6 @@ import itertools
 import numpy as np
 
 from sklearn.neighbors import KDTree
-from markevaluate.Utilities import Utilities as ut
 from markevaluate.Estimate import Estimate
 from markevaluate.KNneighbors import KNneighbors as knn
 

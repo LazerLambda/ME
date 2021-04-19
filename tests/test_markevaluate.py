@@ -5,7 +5,6 @@ import numpy as np
 import os
 import sys
 
-import markevaluate
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from markevaluate import MarkEvaluate
@@ -52,7 +51,6 @@ class TestMarkEvaluate(unittest.TestCase):
 
         me = MarkEvaluate.MarkEvaluate(cand=self.sentences0, ref=self.sentences1)
         result = me.estimate()
-        print(result)
         self.assertTrue(0 <= result['Schnabel'] and result['Schnabel'] <= 1, msg="Test different input with different topics and different lengths.")
         
 

@@ -1,7 +1,6 @@
 import numpy as np
 
 from sentence_transformers import SentenceTransformer
-from markevaluate.Utilities import Utilities as ut
 from markevaluate.Peterson import Peterson as pt
 from markevaluate.Schnabel import Schnabel as sn
 from markevaluate.Capture import Capture as cp
@@ -63,9 +62,9 @@ class MarkEvaluate:
 
         p : int = len(self.cand) + len(self.ref)
         
-        me_peterson = 1 - ut.accuracy_loss(self.peterson(), p) if 'Peterson' in self.metric else None 
-        me_schnabel = 1 - ut.accuracy_loss(self.schnabel(), p) if 'Schnabel' in self.metric else None
-        me_capture  = 1 - ut.accuracy_loss(self.capture(), p) if 'CAPTURE' in self.metric else None
+        me_peterson = 1 - self.accuracy_loss(self.peterson(), p) if 'Peterson' in self.metric else None 
+        me_schnabel = 1 - self.accuracy_loss(self.schnabel(), p) if 'Schnabel' in self.metric else None
+        me_capture  = 1 - self.accuracy_loss(self.capture(), p) if 'CAPTURE' in self.metric else None
 
         self.result = {
             'Peterson' : me_peterson,

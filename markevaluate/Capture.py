@@ -7,7 +7,6 @@ import sys
 from scipy.optimize import minimize_scalar, OptimizeResult
 from scipy.special import factorial
 from markevaluate.KNneighbors import KNneighbors as knn
-from markevaluate.Utilities import Utilities as ut
 from markevaluate.Estimate import Estimate
 
 class Capture(Estimate):

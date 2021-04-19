@@ -8,7 +8,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from sklearn.neighbors import KDTree
 from markevaluate import Schnabel as sn
-from markevaluate import Utilities as ut
 from markevaluate import KNneighbors as knn
 
 class TestSchnabel(unittest.TestCase):

@@ -7,7 +7,6 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from markevaluate import Capture
-from markevaluate import Utilities
 
 class TestCapture(unittest.TestCase):
 

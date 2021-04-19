@@ -1,7 +1,6 @@
 import numpy as np
 
 
-from markevaluate.Utilities import Utilities as ut
 from markevaluate.Estimate import Estimate
 from markevaluate.KNneighbors import KNneighbors as knn
 

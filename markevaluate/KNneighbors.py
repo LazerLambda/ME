@@ -2,6 +2,7 @@ import math
 import numpy as np
 import sys
 
+from progress.bar import ShadyBar
 from typing import Tuple
 from sklearn.neighbors import KDTree
 
@@ -36,7 +37,9 @@ class KNneighbors:
         self.knns_indx : np.ndarray = np.zeros((len(self.embds), k + 1))
         self.kmaxs : np.ndarray = np.zeros((len(self.embds), 1))
 
+        bar = ShadyBar('Finding k-nearest neighbors', max=(len(self.embds) + 1))
         self.kdt : KDTree = KDTree(self.embds, metric='euclidean')
+        bar.next()
 
         for i in range(len(self.embds)):
             
@@ -45,7 +48,9 @@ class KNneighbors:
             self.knns_dist[i] = knns_dist[0]
             self.knns_indx[i] = knns_indx[0]
             self.kmaxs[i] = max(knns_dist[0])
+            bar.next()
 
+        bar.finish()
 
 
     def in_kngbhd(self, index : int, sample : tuple) -> int:
