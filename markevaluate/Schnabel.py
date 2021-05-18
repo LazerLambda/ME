@@ -135,6 +135,7 @@ class Schnabel(Estimate):
         for index, s1 in enumerate(self.knn1.embds):
             for s0 in self.knn0.embds:
                 acc += self.knn1.in_kngbhd(index = index, sample = s0)
+            # IN INNER FOR-LOOP HERE
             acc += len(self.mark(index).intersection(self.knn1.get_knn_set(index=index)))
         return acc
         

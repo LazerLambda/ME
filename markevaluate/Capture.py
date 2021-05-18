@@ -44,12 +44,13 @@ class Capture(Estimate):
         for index1, s1 in enumerate(self.knn1.embds):
             for index0, s0 in enumerate(self.knn0.embds):
                 acc += self.knn0.in_kngbhd(index0, s1) + self.knn1.in_kngbhd(index1, s0)
+            # IN INNER FOR-LOOP HERE
             acc += 2 * (self.k + 1)
         return acc
 
 
 
-    def maximize_likelihood(self, n : int = 10e2) -> float:
+    def maximize_likelihood(self, n : int = 10e6) -> float:
         """ Function that maximes the likelihood
         
         In this function the likelihood is defined and also iteratively maximized, starting
@@ -69,7 +70,7 @@ class Capture(Estimate):
         ## OWN ASUMPTIONS
         m_t : int = len(self.set0) + len(self.set1)
         c_t : int = self.capture_total()
-        t : int = len(self.set0) + len(self.set1)
+        t : int = len(self.set0) + len(self.set1) # UNION HERE
 
         def likelihood(p):
             
