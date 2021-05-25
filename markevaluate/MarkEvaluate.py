@@ -1,7 +1,7 @@
 import numpy as np
 
 from sentence_transformers import SentenceTransformer
-from markevaluate.Peterson import Peterson as pt
+from markevaluate.Petersen import Petersen as pt
 from markevaluate.Schnabel import Schnabel as sn
 from markevaluate.Capture import Capture as cp
 
@@ -13,7 +13,7 @@ class MarkEvaluate:
             self,\
             cand : list,\
             ref : list,\
-            metric : list = ["Schnabel", "Peterson", "CAPTURE"],\
+            metric : list = ["Schnabel", "Petersen", "CAPTURE"],\
             sbert_model_str : str = 'bert-base-nli-mean-tokens',\
             quality : str = "diversity",\
             k : int = 1
@@ -36,7 +36,7 @@ class MarkEvaluate:
 
 
 
-    def peterson(self) -> float:
+    def Petersen(self) -> float:
         pt_estim : pt = pt({tuple(elem) for elem in self.cand}, {tuple(elem) for elem in self.ref}, k = self.k)
         return pt_estim.estimate()
 
@@ -62,12 +62,12 @@ class MarkEvaluate:
 
         p : int = len(self.cand) + len(self.ref)
         
-        me_peterson = 1 - self.accuracy_loss(self.peterson(), p) if 'Peterson' in self.metric else None 
+        me_Petersen = 1 - self.accuracy_loss(self.Petersen(), p) if 'Petersen' in self.metric else None 
         me_schnabel = 1 - self.accuracy_loss(self.schnabel(), p) if 'Schnabel' in self.metric else None
         me_capture  = 1 - self.accuracy_loss(self.capture(), p) if 'CAPTURE' in self.metric else None
 
         self.result = {
-            'Peterson' : me_peterson,
+            'Petersen' : me_Petersen,
             'Schnabel' : me_schnabel,
             'CAPTURE' : me_capture
         }
@@ -98,7 +98,7 @@ class MarkEvaluate:
         print("\n\n")
         print(f"{OKCYAN}Interpretation{ENDC}: 0 poor quality <-> 1 good quality")
         print("\n")
-        print(f"Peterson: {OKBLUE}{self.result['Peterson']}{ENDC}")
+        print(f"Petersen: {OKBLUE}{self.result['Petersen']}{ENDC}")
         print(f"Schnabel: {OKBLUE}{self.result['Schnabel']}{ENDC} *")
         print(f"CAPTURE:  {OKBLUE}{self.result['CAPTURE']}{ENDC}")
         print("\n\n")

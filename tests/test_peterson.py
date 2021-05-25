@@ -6,25 +6,25 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from markevaluate import Peterson as pt
+from markevaluate import Petersen as pt
 
-class TestPeterson(unittest.TestCase):
+class TestPetersen(unittest.TestCase):
 
-    # def test_peterson_0(self):
-    #     test_pt = pt.Peterson(set([]), set([]), k = 2)
+    # def test_Petersen_0(self):
+    #     test_pt = pt.Petersen(set([]), set([]), k = 2)
     #     self.assertRaises(ZeroDivisionError, test_pt.estimate)
 
-    def test_peterson1(self):
+    def test_Petersen1(self):
         s_len = 5
         k = 2
         arr = np.random.rand(s_len, 2)
         set0 = {tuple(elem) for elem in arr}
         set1 = {tuple(elem) for elem in arr}
-        test_pt = pt.Peterson(set0, set1, k)
+        test_pt = pt.Petersen(set0, set1, k)
         result = 2 * s_len
         self.assertEqual(test_pt.estimate(), result)
     
-    def test_peterson2(self):
+    def test_Petersen2(self):
 
         s0_len = random.randrange(4, 10) #10e2)
         s1_len = random.randrange(4, 10) #10e2)
@@ -37,10 +37,10 @@ class TestPeterson(unittest.TestCase):
         set0 = {tuple(elem) for elem in arr0}
         set1 = {tuple(elem) for elem in arr1}
 
-        test_pt = pt.Peterson(set0, set1, k)
+        test_pt = pt.Petersen(set0, set1, k)
         self.assertGreaterEqual(int(test_pt.estimate()), s0_len + s1_len)
 
-    def test_peterson3(self):
+    def test_Petersen3(self):
 
         # PERFORMANCE
         s0_len = random.randrange(4, 10000)
@@ -54,7 +54,7 @@ class TestPeterson(unittest.TestCase):
         set0 = {tuple(elem) for elem in arr0}
         set1 = {tuple(elem) for elem in arr1}
 
-        test_pt = pt.Peterson(set0, set1, k)
+        test_pt = pt.Petersen(set0, set1, k)
         self.assertGreaterEqual(int(test_pt.estimate()), s0_len + s1_len)
 
 

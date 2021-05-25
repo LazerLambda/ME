@@ -5,10 +5,10 @@ from markevaluate.Estimate import Estimate
 from markevaluate.KNneighbors import KNneighbors as knn
 
 
-class Peterson(Estimate):
-    """ Computing the ME-Peterson-estimator
+class Petersen(Estimate):
+    """ Computing the ME-Petersen-estimator
     
-    Class to provide the functions to compute the ME-Peterson-estimator.
+    Class to provide the functions to compute the ME-Petersen-estimator.
     """
 
     def mark(self) -> int:
@@ -65,14 +65,14 @@ class Peterson(Estimate):
     def estimate(self) -> float:
         """ Estimate function
 
-        Computes the ME-Peterson-estimator.
+        Computes the ME-Petersen-estimator.
 
         Complexity is O(n^2)
 
         Returns
         -------
         float
-            ME-Peterson-estimation of the population
+            ME-Petersen-estimation of the population
         """
 
         return self.capture() * self.mark() / self.recapture()

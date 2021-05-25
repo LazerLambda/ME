@@ -30,7 +30,7 @@ class TestMarkEvaluate(unittest.TestCase):
     def test_markevaluate1(self):
 
         me = MarkEvaluate.MarkEvaluate(cand=self.sentences0, ref=self.sentences0)
-        self.assertEqual(me.estimate()['Peterson'], 1, msg="Test Peterson Estimator using Theorem A.1.")
+        self.assertEqual(me.estimate()['Petersen'], 1, msg="Test Petersen Estimator using Theorem A.1.")
     
     def test_markevaluate2(self):
 
