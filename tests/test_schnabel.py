@@ -2,6 +2,7 @@ import unittest
 import numpy as np
 
 import os
+import random
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -58,7 +59,18 @@ class TestSchnabel(unittest.TestCase):
 
     def test_schnabel3_1(self):
         s_len = 5 
-        k = 0
+        k = 2
+
+        arr = np.random.rand(s_len, 2)
+        set0 = {tuple(elem) for elem in arr}
+        set1 = {tuple(elem) for elem in arr}
+
+        test_sn = sn.Schnabel(set0, set1, k, orig=True)
+        self.assertGreaterEqual(test_sn.capture_sum(), (k + 1) * s_len)
+
+    def test_schnabel3_2(self):
+        s_len = random.randint(4, 20)
+        k = random.randint(0, s_len - 1)
 
         arr = np.random.rand(s_len, 2)
         set0 = {tuple(elem) for elem in arr}

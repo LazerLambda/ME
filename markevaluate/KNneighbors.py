@@ -140,7 +140,6 @@ class KNneighbors:
     
     @staticmethod
     def is_in_hypersphere(elem : tuple, sample: np.ndarray, k : int) -> int:
-        print(sample)
         kdt : KDTree = KDTree(sample, metric='euclidean')
         for s in sample:
             k_nn_dist, _ = kdt.query([s], k= k + 1)
