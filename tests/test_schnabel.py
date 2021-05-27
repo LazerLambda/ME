@@ -55,6 +55,18 @@ class TestSchnabel(unittest.TestCase):
         test_sn = sn.Schnabel(set0, set1, k)
         self.assertEqual(test_sn.capture_sum(), (k + 1) * s_len)
 
+
+    def test_schnabel3_1(self):
+        s_len = 5 
+        k = 0
+
+        arr = np.random.rand(s_len, 2)
+        set0 = {tuple(elem) for elem in arr}
+        set1 = {tuple(elem) for elem in arr}
+
+        test_sn = sn.Schnabel(set0, set1, k, orig=True)
+        self.assertGreaterEqual(test_sn.capture_sum(), (k + 1) * s_len)
+
     def test_schnabel4(self):
         ## PROBLEM
         s_len = 5 
@@ -133,7 +145,7 @@ class TestSchnabel(unittest.TestCase):
 
 
         test_sn = sn.Schnabel(set0, set1, k, orig=True)
-        self.assertEqual(test_sn.recapture(), (len(arr) + len(arr) ** 2) * (k + 1), msg="Test recapture function, original description")
+        self.assertGreaterEqual(test_sn.recapture(), (len(arr) + len(arr) ** 2) * (k + 1), msg="Test recapture function, original description")
 
     
     def test_schnabel9(self):

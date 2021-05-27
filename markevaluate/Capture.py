@@ -45,11 +45,15 @@ class Capture(Estimate):
         acc : int = 0
         for index1, s1 in enumerate(self.knn1.embds):
             for index0, s0 in enumerate(self.knn0.embds):
-                acc += self.knn0.in_kngbhd(index0, s1) + self.knn1.in_kngbhd(index1, s0)
                 
-            # Original vs theorem based implementation
                 if self.orig:
+                    # orig
+                    # TODO binary function
+                    acc += self.knn0.in_kngbhd(index0, s1) + self.knn1.in_kngbhd(index1, s0)  
                     acc += 2 * (self.k + 1)
+                else:
+                    # theorem based
+                    acc += self.knn0.in_kngbhd(index0, s1) + self.knn1.in_kngbhd(index1, s0)        
             if not self.orig:
                 acc += 2 * (self.k + 1)
         return acc

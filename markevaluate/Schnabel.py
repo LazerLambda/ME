@@ -86,7 +86,14 @@ class Schnabel(Estimate):
         acc : int = 0
         for index, _ in enumerate(self.knn1.embds):
             for s0 in self.knn0.embds:
-                acc += self.knn1.in_kngbhd(index=index, sample=s0)
+                # Original vs theorem based implementation
+                if self.orig:
+                    # original
+                    # TODO binary function
+                    acc += self.knn1.in_hypsphr(sample=tuple(s0))
+                else:
+                    # theorem based
+                    acc += self.knn1.in_kngbhd(index=index, sample=s0)
         return acc
 
 
@@ -141,12 +148,16 @@ class Schnabel(Estimate):
         acc : int = 0
         for index, s1 in enumerate(self.knn1.embds):
             for s0 in self.knn0.embds:
-                acc += self.knn1.in_kngbhd(index = index, sample = s0)
-            
-            # Original vs theorem based implementation
                 if self.orig:
+                    # original
+                    # TODO binary function
+                    acc += self.knn1.in_hypsphr(sample=tuple(s0))
                     acc += len(self.mark(index).intersection(self.knn1.get_knn_set(index=index)))
+                else:
+                    # theorem based
+                    acc += self.knn1.in_kngbhd(index = index, sample = s0)
             if not self.orig:
+                # theorem based
                 acc += len(self.mark(index).intersection(self.knn1.get_knn_set(index=index)))
         return acc
         

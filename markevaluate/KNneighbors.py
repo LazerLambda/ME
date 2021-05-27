@@ -14,7 +14,7 @@ class KNneighbors:
     values are then stored and can be easily accessed through indexing.
     """
 
-    def __init__(self, embds : np.ndarray, k : int) -> None:
+    def __init__(self, embds : np.ndarray, k : int, verbose : bool = False) -> None:
         """Initializing function
 
         Building up the datastructure to store the k-nearest-neighbor information.
@@ -37,9 +37,11 @@ class KNneighbors:
         self.knns_indx : np.ndarray = np.zeros((len(self.embds), k + 1))
         self.kmaxs : np.ndarray = np.zeros((len(self.embds), 1))
 
-        bar = ShadyBar('Finding k-nearest neighbors', max=(len(self.embds) + 1))
+        if verbose:
+            bar = ShadyBar('Finding k-nearest neighbors', max=(len(self.embds) + 1))
         self.kdt : KDTree = KDTree(self.embds, metric='euclidean')
-        bar.next()
+        if verbose:
+            bar.next()
 
         for i in range(len(self.embds)):
             
@@ -48,9 +50,11 @@ class KNneighbors:
             self.knns_dist[i] = knns_dist[0]
             self.knns_indx[i] = knns_indx[0]
             self.kmaxs[i] = max(knns_dist[0])
-            bar.next()
+            if verbose:
+                bar.next()
 
-        bar.finish()
+        if verbose:
+            bar.finish()
 
 
     def in_kngbhd(self, index : int, sample : tuple) -> int:
