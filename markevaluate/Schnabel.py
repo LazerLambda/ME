@@ -114,13 +114,20 @@ class Schnabel(Estimate):
     def recapture(self) -> int:
         """ Recapture function
 
-        "Since all samplesinShave been marked in the first marking step, the number of total recaptures is the 
-        number of samples in S inside the hypersphere of each s′as well as the number of k-nearest neighbors 
+        "Since all samplesinShave been marked in the first marking step, the 
+        number of total recaptures is the number of samples in S inside the 
+        hypersphere of each s′as well as the number of k-nearest neighbors 
         of the iterated s′thathave already been marked[...]"
         Mordido, Meinel, 2020: https://arxiv.org/abs/2010.04606
 
-        This function is using an indicator function to determine if a sample is inside the k-nearest-neighborhood
-        instead of the binary function (2) to comply with Theorem A.2.
+        This function is using an indicator function to determine if a sample is 
+        inside the k-nearest-neighborhood instead of the binary function (2) 
+        to comply with Theorem A.2.
+        This function uses the properties of Theorem A.2. in Mordido and Meinel 
+        2020 by default. This function is using an indicator function to determine 
+        if a sample is inside the k-nearest-neighborhood instead of the binary function.
+        The function proposed in the main part of the paper can be called by 
+        setting the `orig` paramter to True when calling Schnabel().
 
         Complexity is O(n^2).
 
@@ -135,8 +142,12 @@ class Schnabel(Estimate):
         for index, s1 in enumerate(self.knn1.embds):
             for s0 in self.knn0.embds:
                 acc += self.knn1.in_kngbhd(index = index, sample = s0)
-            # IN INNER FOR-LOOP HERE
-            acc += len(self.mark(index).intersection(self.knn1.get_knn_set(index=index)))
+            
+            # Original vs theorem based implementation
+                if self.orig:
+                    acc += len(self.mark(index).intersection(self.knn1.get_knn_set(index=index)))
+            if not self.orig:
+                acc += len(self.mark(index).intersection(self.knn1.get_knn_set(index=index)))
         return acc
         
 

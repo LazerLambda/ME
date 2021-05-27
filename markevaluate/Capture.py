@@ -24,9 +24,11 @@ class Capture(Estimate):
         in S inside the hypersphere of a givens′and vice-versa[...]"
         Mordido, Meinel, 2020: https://arxiv.org/abs/2010.04606
 
-        This function is altered to fit in Theorem A.3. in Mordido and Meinel 2020.
-        The respective cardinality of the k-nearest neighbor set is only iterated
-        in the outer loop.
+        This function uses the properties of Theorem A.3. in Mordido and Meinel 
+        2020 by default. The respective cardinality of the k-nearest neighbor 
+        set is only iterated in the outer loop.
+        The function proposed in the main part of the paper can be called by 
+        setting the `orig` paramter to True when calling Capture().
 
         The complexity is O(n^2)
 
@@ -44,20 +46,28 @@ class Capture(Estimate):
         for index1, s1 in enumerate(self.knn1.embds):
             for index0, s0 in enumerate(self.knn0.embds):
                 acc += self.knn0.in_kngbhd(index0, s1) + self.knn1.in_kngbhd(index1, s0)
-            # IN INNER FOR-LOOP HERE
-            acc += 2 * (self.k + 1)
+                
+            # Original vs theorem based implementation
+                if self.orig:
+                    acc += 2 * (self.k + 1)
+            if not self.orig:
+                acc += 2 * (self.k + 1)
         return acc
 
 
 
-    def maximize_likelihood(self, n : int = 10e6) -> float:
+    def maximize_likelihood(self, n : int = 10e2) -> float:
         """ Function that maximes the likelihood
         
-        In this function the likelihood is defined and also iteratively maximized, starting
-        from len(set0) + len(self.set1) based on the assumption that we have a concatenation here.
+        In this function the likelihood is defined and also iteratively maximized,
+        starting from len(set0) + len(self.set1) based on the assumption that 
+        we have a concatenation here.
 
-        This function is altered to fit in Theorem A.3. in Mordido and Meinel 2020. It is assumed
-        that M_T(S,S') = |S concat S'| instead of |S union S'|
+        This function uses the properties of Theorem A.3. in Mordido and Meinel
+        2020 by default. It is assumed that M_T(S,S') = |S concat S'| instead of 
+        |S union S'|. 
+        The function proposed in the main part of the paper can be called by
+        setting the `orig` paramter to True when calling Capture().
 
         The complexity is O(n).
 
@@ -67,25 +77,38 @@ class Capture(Estimate):
             max iterations
         """
 
-        ## OWN ASUMPTIONS
-        m_t : int = len(self.set0) + len(self.set1)
+        # Difference between theorem based and original implementation
+        m_t : int = 0
+        t : int = 0  
+        if self.orig:
+            m_t = len(self.set0.union(self.set1))
+        else:
+            m_t = len(self.set0) + len(self.set1)
+
+        if self.orig:
+            t = len(self.set0.union(self.set1))
+        else:
+            t = len(self.set0) + len(self.set1)
+
         c_t : int = self.capture_total()
-        t : int = len(self.set0) + len(self.set1) # UNION HERE
 
         def likelihood(p):
+            # likelihood function
             
             def log_factorial(x : int) -> int:
+                # helper function to make it easier computing the log of a factorials
                 acc : int = 0
                 for e in np.arange(1, (x + 1)):
                     acc += np.log(e)
                 return acc
 
-            return (\
+            y : float = (\
                 log_factorial(p) - log_factorial((p - m_t)) + \
                 c_t * np.log(c_t) + \
                 (t * p - c_t) * np.log(t * p - c_t) - \
                 t * p * np.log(t * p) \
                 )
+            return y
 
 
         min_val : int = m_t

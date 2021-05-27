@@ -10,10 +10,6 @@ from markevaluate import Petersen as pt
 
 class TestPetersen(unittest.TestCase):
 
-    # def test_Petersen_0(self):
-    #     test_pt = pt.Petersen(set([]), set([]), k = 2)
-    #     self.assertRaises(ZeroDivisionError, test_pt.estimate)
-
     def test_Petersen1(self):
         s_len = 5
         k = 2
@@ -43,8 +39,8 @@ class TestPetersen(unittest.TestCase):
     def test_Petersen3(self):
 
         # PERFORMANCE
-        s0_len = random.randrange(4, 10000)
-        s1_len = random.randrange(4, 10000)
+        s0_len = random.randrange(4, 1000)
+        s1_len = random.randrange(4, 1000)
         rand_dim = random.randrange(1, 20)
         k = 2
 

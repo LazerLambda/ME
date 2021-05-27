@@ -112,8 +112,6 @@ class TestSchnabel(unittest.TestCase):
 
         
     def test_schnabel8(self):
-        ## PROBLEM
-        ## ERROR
         s_len = 6 
         k = 2
 
@@ -123,8 +121,19 @@ class TestSchnabel(unittest.TestCase):
 
 
         test_sn = sn.Schnabel(set0, set1, k)
-        # kdt1 = kdt0
-        self.assertEqual(test_sn.recapture(), len(arr) * (k + 1) * 2, msg="Test recapture function")
+        self.assertEqual(test_sn.recapture(), len(arr) * (k + 1) * 2, msg="Test recapture function, theorem based")
+    
+    def test_schnabel8_1(self):
+        s_len = 6 
+        k = 2
+
+        arr = np.random.rand(s_len, 2)
+        set0 = {tuple(elem) for elem in arr}
+        set1 = {tuple(elem) for elem in arr}
+
+
+        test_sn = sn.Schnabel(set0, set1, k, orig=True)
+        self.assertEqual(test_sn.recapture(), (len(arr) + len(arr) ** 2) * (k + 1), msg="Test recapture function, original description")
 
     
     def test_schnabel9(self):
@@ -141,7 +150,7 @@ class TestSchnabel(unittest.TestCase):
         self.assertEqual(test_sn.estimate(), 2 * s_len)
 
 
-    def test_schnabel9(self):
+    def test_schnabel10(self):
         s_len0 = 10
         s_len1 = 10
         k = 1
