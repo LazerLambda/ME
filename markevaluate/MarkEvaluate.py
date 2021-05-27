@@ -16,12 +16,14 @@ class MarkEvaluate:
             metric : list = ["Schnabel", "Petersen", "CAPTURE"],\
             sbert_model_str : str = 'bert-base-nli-mean-tokens',\
             quality : str = "diversity",\
+            orig : bool = False,\
             k : int = 1
             ) -> None:
 
         self.metric : list = metric
         self.sbert_model : SentenceTransformer = SentenceTransformer(sbert_model_str) # CUDA support
         self.k : int = k
+        self.orig : bool = orig
         self.quality : str = quality
 
         self.cand : np.ndarray = self.get_embds_sbert(cand)
@@ -36,25 +38,24 @@ class MarkEvaluate:
 
 
 
-    def Petersen(self) -> float:
-        pt_estim : pt = pt({tuple(elem) for elem in self.cand}, {tuple(elem) for elem in self.ref}, k = self.k)
+    def petersen(self) -> float:
+        pt_estim : pt = pt({tuple(elem) for elem in self.cand}, {tuple(elem) for elem in self.ref}, k = self.k, orig=self.orig)
         return pt_estim.estimate()
 
 
 
     def schnabel(self, type : str = "quality") -> float:
 
-        if self.quality == "diversity":
-            sn_estim : sn = sn({tuple(elem) for elem in self.cand}, {tuple(elem) for elem in self.ref}, k = self.k)
-            return sn_estim.estimate()
-        else:
-            sn_estim : sn = sn({tuple(elem) for elem in self.ref}, {tuple(elem) for elem in self.cand}, k = self.k)
-            return sn_estim.estimate()
+        sn_estim : sn = sn({tuple(elem) for elem in self.cand}, {tuple(elem) for elem in self.ref}, k = self.k, orig=self.orig)
+        schn_div = sn_estim.estimate()
+        sn_estim : sn = sn({tuple(elem) for elem in self.ref}, {tuple(elem) for elem in self.cand}, k = self.k, orig=self.orig)
+        schn_qul =  sn_estim.estimate()
 
+        return schn_div, schn_qul
 
 
     def capture(self) -> float:
-        cp_estim : cp = cp({tuple(elem) for elem in self.cand}, {tuple(elem) for elem in self.ref}, k = self.k)
+        cp_estim : cp = cp({tuple(elem) for elem in self.cand}, {tuple(elem) for elem in self.ref}, k = self.k, orig=self.orig)
         return cp_estim.estimate()
 
 
@@ -62,13 +63,16 @@ class MarkEvaluate:
 
         p : int = len(self.cand) + len(self.ref)
         
-        me_Petersen = 1 - self.accuracy_loss(self.Petersen(), p) if 'Petersen' in self.metric else None 
-        me_schnabel = 1 - self.accuracy_loss(self.schnabel(), p) if 'Schnabel' in self.metric else None
+        me_petersen = 1 - self.accuracy_loss(self.petersen(), p) if 'Petersen' in self.metric else None 
         me_capture  = 1 - self.accuracy_loss(self.capture(), p) if 'CAPTURE' in self.metric else None
+        me_schnabel_div,  me_schnabel_qul = self.schnabel()
+        me_schnabel_div = 1 - self.accuracy_loss(me_schnabel_div, p) if 'Schnabel' in self.metric else None
+        me_schnabel_qul = 1 - self.accuracy_loss(me_schnabel_qul, p) if 'Schnabel' in self.metric else None
 
         self.result = {
-            'Petersen' : me_Petersen,
-            'Schnabel' : me_schnabel,
+            'Petersen' : me_petersen,
+            'Schnabel_qul' : me_schnabel_qul,
+            'Schnabel_div' : me_schnabel_div,
             'CAPTURE' : me_capture
         }
 

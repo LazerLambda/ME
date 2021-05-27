@@ -47,8 +47,7 @@ class Capture(Estimate):
             for index0, s0 in enumerate(self.knn0.embds):
                 
                 if self.orig:
-                    # orig
-                    # TODO binary function
+                    # original
                     acc += self.knn0.is_in_hypersphere(elem=index0, sample=np.asarray(list(self.knn1.get_knn_set(index1))), k=self.k)
                     acc += self.knn1.is_in_hypersphere(elem=index1, sample=np.asarray(list(self.knn0.get_knn_set(index0))), k=self.k)
                     acc += len(self.knn1.get_knn_set(index1)) + len(self.knn0.get_knn_set(index0))
@@ -116,7 +115,11 @@ class Capture(Estimate):
             return y
 
 
-        min_val : int = m_t
+        if self.orig:
+            min_val : int = m_t if m_t > c_t else c_t
+        else:
+            min_val : int = m_t
+
 
         # Iterating over integers
         x : np.ndarray = np.arange(start = min_val, stop = n, dtype = int)
