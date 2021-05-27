@@ -135,3 +135,19 @@ class KNneighbors:
             if dist <= self.kmaxs[index]:
                 return 1
         return 0
+
+    
+    
+    @staticmethod
+    def is_in_hypersphere(elem : tuple, sample: np.ndarray, k : int) -> int:
+        print(sample)
+        kdt : KDTree = KDTree(sample, metric='euclidean')
+        for s in sample:
+            k_nn_dist, _ = kdt.query([s], k= k + 1)
+
+            mx = np.amax(k_nn_dist)
+            dist = np.linalg.norm(elem - s)
+
+            if  dist <= mx:
+                return 1
+        return 0

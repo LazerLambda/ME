@@ -84,16 +84,15 @@ class Schnabel(Estimate):
         """
 
         acc : int = 0
-        for index, _ in enumerate(self.knn1.embds):
-            for s0 in self.knn0.embds:
+        for index1, s1 in enumerate(self.knn1.embds):
+            for index0, s0 in enumerate(self.knn0.embds):
                 # Original vs theorem based implementation
                 if self.orig:
                     # original
-                    # TODO binary function
-                    acc += self.knn1.in_hypsphr(sample=tuple(s0))
+                    acc += self.knn1.is_in_hypersphere(elem=tuple(s0), sample=np.asarray(self.knn0.get_knn_set(index1)), k=self.k)
                 else:
                     # theorem based
-                    acc += self.knn1.in_kngbhd(index=index, sample=s0)
+                    acc += self.knn1.in_kngbhd(index=index1, sample=s0)
         return acc
 
 
