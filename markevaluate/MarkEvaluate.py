@@ -1,9 +1,9 @@
 import numpy as np
 
 from sentence_transformers import SentenceTransformer
-from markevaluate.Petersen import Petersen as pt
-from markevaluate.Schnabel import Schnabel as sn
-from markevaluate.Capture import Capture as cp
+from .Petersen import Petersen as pt
+from .Schnabel import Schnabel as sn
+from .Capture import Capture as cp
 
 class MarkEvaluate:
 

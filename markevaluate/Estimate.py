@@ -1,6 +1,6 @@
 import numpy as np
 
-from markevaluate import KNneighbors as knn
+from . import KNneighbors as knn
 
 
 
