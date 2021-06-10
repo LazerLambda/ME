@@ -6,8 +6,8 @@ import sys
 
 from scipy.optimize import minimize_scalar, OptimizeResult
 from scipy.special import factorial
-from markevaluate.KNneighbors import KNneighbors as knn
-from markevaluate.Estimate import Estimate
+from .KNneighbors import KNneighbors as knn
+from .Estimate import Estimate
 
 class Capture(Estimate):
     """ Computing the ME-CAPTURE-estimator

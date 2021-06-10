@@ -1,8 +1,8 @@
 import numpy as np
 
 
-from markevaluate.Estimate import Estimate
-from markevaluate.KNneighbors import KNneighbors as knn
+from .Estimate import Estimate
+from .KNneighbors import KNneighbors as knn
 
 
 class Petersen(Estimate):
