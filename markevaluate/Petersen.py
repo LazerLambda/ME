@@ -75,4 +75,8 @@ class Petersen(Estimate):
             ME-Petersen-estimation of the population
         """
 
-        return self.capture() * self.mark() / self.recapture()
+        c : int = self.capture()
+        m : int = self.mark()
+        r : int = self.recapture()
+
+        return c * m / r if r != 0 else 0
