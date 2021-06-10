@@ -29,52 +29,52 @@ class TestMarkEvaluate(unittest.TestCase):
 
     def test_markevaluate1(self):
 
-        me = MarkEvaluate.MarkEvaluate(cand=self.sentences0, ref=self.sentences0)
-        self.assertEqual(me.estimate()['Petersen'], 1, msg="Test Petersen Estimator using Theorem A.1.")
+        me = MarkEvaluate.MarkEvaluate()
+        self.assertEqual(me.estimate(cand=self.sentences0, ref=self.sentences0)['Petersen'], 1, msg="Test Petersen Estimator using Theorem A.1.")
     
     def test_markevaluate2(self):
 
-        me = MarkEvaluate.MarkEvaluate(cand=self.sentences0, ref=self.sentences0)
-        res = me.estimate()
+        me = MarkEvaluate.MarkEvaluate()
+        res = me.estimate(cand=self.sentences0, ref=self.sentences0)
         self.assertEqual(res['Schnabel_qul'], 1, msg="Test Schnabel (quality) Estimator using Theorem A.2.")
         self.assertEqual(res['Schnabel_div'], 1, msg="Test Schnabel (diversity) Estimator using Theorem A.2.")
 
     def test_markevaluate2_2(self):
 
-        me = MarkEvaluate.MarkEvaluate(cand=self.sentences0, ref=self.sentences0, orig=True)
-        res = me.estimate()['Schnabel_qul']
+        me = MarkEvaluate.MarkEvaluate(orig=True)
+        res = me.estimate(cand=self.sentences0, ref=self.sentences0)['Schnabel_qul']
         self.assertTrue(0 <= res and res <= 1, msg="Test Schnabel (quality) Estimator (original).")
-        res = me.estimate()['Schnabel_div']
+        res = me.estimate(cand=self.sentences0, ref=self.sentences0)['Schnabel_div']
         self.assertTrue(0 <= res and res <= 1, msg="Test Schnabel (diversity) Estimator (original).")
 
     def test_markevaluate3(self):
 
-        me = MarkEvaluate.MarkEvaluate(cand=self.sentences0, ref=self.sentences0, quality="")
-        self.assertEqual(me.estimate()['Schnabel_qul'], 1, msg="Test Schnabel Estimator using Theorem A.2.")
+        me = MarkEvaluate.MarkEvaluate()
+        self.assertEqual(me.estimate(cand=self.sentences0, ref=self.sentences0,)['Schnabel_qul'], 1, msg="Test Schnabel Estimator using Theorem A.2.")
 
     def test_markevaluate3_3(self):
 
-        me = MarkEvaluate.MarkEvaluate(cand=self.sentences0, ref=self.sentences0, quality="", orig=True)
-        res = me.estimate()['Schnabel_qul']
+        me = MarkEvaluate.MarkEvaluate(orig=True)
+        res = me.estimate(cand=self.sentences0, ref=self.sentences0)['Schnabel_qul']
         self.assertTrue(0 <= res and res <= 1, msg="Test Schnabel (quality) Estimator (original).")
-        res = me.estimate()['Schnabel_div']
+        res = me.estimate(cand=self.sentences0, ref=self.sentences0)['Schnabel_div']
         self.assertTrue(0 <= res and res <= 1, msg="Test Schnabel (diversity) Estimator (original).")
 
     def test_markevaluate4(self):
 
-        me = MarkEvaluate.MarkEvaluate(cand=self.sentences0, ref=self.sentences0)
-        self.assertEqual(me.estimate()['CAPTURE'], 1, msg="Test CAPTURE Estimator using Theorem A.3.")
+        me = MarkEvaluate.MarkEvaluate()
+        self.assertEqual(me.estimate(cand=self.sentences0, ref=self.sentences0)['CAPTURE'], 1, msg="Test CAPTURE Estimator using Theorem A.3.")
 
     def test_markevaluate4_4(self):
 
-        me = MarkEvaluate.MarkEvaluate(cand=self.sentences0, ref=self.sentences0, orig=True)
-        res = me.estimate()['CAPTURE']
+        me = MarkEvaluate.MarkEvaluate(orig=True)
+        res = me.estimate(cand=self.sentences0, ref=self.sentences0)['CAPTURE']
         self.assertTrue(0 <= res and res <= 1, msg="Test CAPTURE Estimator (original).")
 
     def test_markevaluate5(self):
 
-        me = MarkEvaluate.MarkEvaluate(cand=self.sentences0, ref=self.sentences1)
-        result = me.estimate()
+        me = MarkEvaluate.MarkEvaluate()
+        result = me.estimate(cand=self.sentences0, ref=self.sentences1)
         self.assertTrue(0 <= result['Schnabel_qul'] and result['Schnabel_qul'] <= 1, msg="Test different input with different topics and different lengths.")
         self.assertTrue(0 <= result['Schnabel_div'] and result['Schnabel_div'] <= 1, msg="Test different input with different topics and different lengths.")
         

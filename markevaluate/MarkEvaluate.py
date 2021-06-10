@@ -11,8 +11,6 @@ class MarkEvaluate:
 
     def __init__(\
             self,\
-            cand : list,\
-            ref : list,\
             metric : list = ["Schnabel", "Petersen", "CAPTURE"],\
             sbert_model_str : str = 'bert-base-nli-mean-tokens',\
             quality : str = "diversity",\
@@ -26,9 +24,6 @@ class MarkEvaluate:
         self.orig : bool = orig
         self.quality : str = quality
 
-        self.cand : np.ndarray = self.get_embds_sbert(cand)
-        self.ref : np.ndarray = self.get_embds_sbert(ref)
-
         self.result : dict = None
 
 
@@ -38,34 +33,38 @@ class MarkEvaluate:
 
 
 
-    def petersen(self) -> float:
-        pt_estim : pt = pt({tuple(elem) for elem in self.cand}, {tuple(elem) for elem in self.ref}, k = self.k, orig=self.orig)
+    def petersen(self, cand : list, ref : list) -> float:
+        pt_estim : pt = pt({tuple(elem) for elem in cand}, {tuple(elem) for elem in ref}, k = self.k, orig=self.orig)
         return pt_estim.estimate()
 
 
 
-    def schnabel(self, type : str = "quality") -> float:
+    def schnabel(self, cand : list, ref : list) -> float:
 
-        sn_estim : sn = sn({tuple(elem) for elem in self.cand}, {tuple(elem) for elem in self.ref}, k = self.k, orig=self.orig)
+        sn_estim : sn = sn({tuple(elem) for elem in cand}, {tuple(elem) for elem in ref}, k = self.k, orig=self.orig)
         schn_div = sn_estim.estimate()
-        sn_estim : sn = sn({tuple(elem) for elem in self.ref}, {tuple(elem) for elem in self.cand}, k = self.k, orig=self.orig)
+        sn_estim : sn = sn({tuple(elem) for elem in ref}, {tuple(elem) for elem in cand}, k = self.k, orig=self.orig)
         schn_qul =  sn_estim.estimate()
 
         return schn_div, schn_qul
 
 
-    def capture(self) -> float:
-        cp_estim : cp = cp({tuple(elem) for elem in self.cand}, {tuple(elem) for elem in self.ref}, k = self.k, orig=self.orig)
+    def capture(self, cand : list, ref : list) -> float:
+        cp_estim : cp = cp({tuple(elem) for elem in cand}, {tuple(elem) for elem in ref}, k = self.k, orig=self.orig)
         return cp_estim.estimate()
 
 
-    def estimate(self) -> dict:
+    def estimate(self, cand : list, ref : list) -> dict:
 
-        p : int = len(self.cand) + len(self.ref)
+        cand : np.ndarray = self.get_embds_sbert(cand)
+        ref : np.ndarray = self.get_embds_sbert(ref)
+
+
+        p : int = len(cand) + len(ref)
         
-        me_petersen = 1 - self.accuracy_loss(self.petersen(), p) if 'Petersen' in self.metric else None 
-        me_capture  = 1 - self.accuracy_loss(self.capture(), p) if 'CAPTURE' in self.metric else None
-        me_schnabel_div,  me_schnabel_qul = self.schnabel()
+        me_petersen = 1 - self.accuracy_loss(self.petersen(cand=cand, ref=ref), p) if 'Petersen' in self.metric else None 
+        me_capture  = 1 - self.accuracy_loss(self.capture(cand=cand, ref=ref), p) if 'CAPTURE' in self.metric else None
+        me_schnabel_div,  me_schnabel_qul = self.schnabel(cand=cand, ref=ref)
         me_schnabel_div = 1 - self.accuracy_loss(me_schnabel_div, p) if 'Schnabel' in self.metric else None
         me_schnabel_qul = 1 - self.accuracy_loss(me_schnabel_qul, p) if 'Schnabel' in self.metric else None
 
@@ -94,7 +93,7 @@ class MarkEvaluate:
         UNDERLINE = '\033[4m'
         
         if self.result == None:
-            self.estimate()
+            raise Exception("ERROR:\n\t'-> No results to summarize. Call ME.estimate(cand, ref) first.")
 
         # Output
         print("\n")
