@@ -74,9 +74,8 @@ class Petersen(Estimate):
         float
             ME-Petersen-estimation of the population
         """
-
         c : int = self.capture()
         m : int = self.mark()
         r : int = self.recapture()
-
+        
         return c * m / r if r != 0 else 0
