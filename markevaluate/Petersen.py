@@ -76,6 +76,6 @@ class Petersen(Estimate):
         """
         c : int = self.capture()
         m : int = self.mark()
-        r : int = self.recapture
-
-        return  c * m / r if r != 0 else 0
+        r : int = self.recapture()
+        
+        return c * m / r if r != 0 else 0
