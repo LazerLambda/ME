@@ -55,6 +55,7 @@ class Capture(Estimate):
                     # theorem based
                     acc += self.knn0.in_kngbhd(index0, s1) + self.knn1.in_kngbhd(index1, s0)        
             if not self.orig:
+                # |NN_k(s, S)| = (k + 1)
                 acc += 2 * (self.k + 1)
         return acc
 
