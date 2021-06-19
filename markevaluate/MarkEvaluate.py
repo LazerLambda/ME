@@ -47,9 +47,9 @@ class MarkEvaluate:
             return self.model.encode(sentences)
         else:
             inputs =\
-                [self.tokenizer(
+                [(self.tokenizer(
                     sentence,
-                    return_tensors="tf") for sentence in sentences]
+                    return_tensors="tf"))[2][-5:] for sentence in sentences]
             # TODO checks
             return [self.model(
                 inpt,
