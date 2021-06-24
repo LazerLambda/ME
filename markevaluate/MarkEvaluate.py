@@ -1,13 +1,17 @@
 """Entry module for Mark-Evaluate."""
 
 import numpy as np
+import os
+import torch
 import tensorflow as tf
+import time
 
 from sentence_transformers import SentenceTransformer
-from transformers import BertTokenizer, TFBertModel
+from transformers import BertTokenizer, BertModel
 from .Petersen import Petersen as pt
 from .Schnabel import Schnabel as sn
 from .Capture import Capture as cp
+from . import DataOrg as do
 
 
 class MarkEvaluate:
@@ -20,25 +24,39 @@ class MarkEvaluate:
             quality: str = "diversity",
             orig: bool = False,
             k: int = 1,
-            sent_transf: bool = False
-            ) -> None:
+            sent_transf: bool = True,
+            verbose: bool = False,
+            sntnc_lvl: bool = False
+    ) -> None:
         """Initialize function for ME class.
 
         Defining whether to use SBERT or BERT.
         """
         self.metric: list = metric
+        self.model: any = None
+        self.tokenizer: any = None
         if sent_transf:
-            self.tokenizer =\
-                BertTokenizer.from_pretrained('bert-base-cased')
-            self.model: TFBertModels =\
-                TFBertModel.from_pretrained('bert-base-cased')
-        else:
             self.model: SentenceTransformer = SentenceTransformer(model_str)
+        else:
+            path: str = os.path.join(
+                os.path.dirname(os.path.realpath(__file__)),
+                'bert_base_mnli')
+            self.tokenizer =\
+                BertTokenizer.from_pretrained(path)
+            self.model = \
+                BertModel.from_pretrained(path,
+                                          output_hidden_states=True)
+            # To get the last 5 layers of BERT
+            self.model.eval()
+
         self.k: int = k
         self.orig: bool = orig
         self.quality: str = quality
         self.sent_transf: bool = sent_transf
+        self.verbose: bool = verbose
+        self.sntnc_lvl: bool = sntnc_lvl
 
+        self.data_org: do = None
         self.result: dict = None
 
     def get_embds(self, sentences: list) -> np.ndarray:
@@ -46,68 +64,92 @@ class MarkEvaluate:
         if self.sent_transf:
             return self.model.encode(sentences)
         else:
-            inputs =\
-                [(self.tokenizer(
-                    sentence,
-                    return_tensors="tf"))[2][-5:] for sentence in sentences]
-            # TODO checks
-            return [self.model(
-                inpt,
-                output_hidden_states=True) for inpt in inputs]
+            embd_set: list = list()
 
-    def petersen(self, cand: list, ref: list) -> float:
+            for i, sentence in enumerate(sentences):
+
+                tokenized_sent = self.tokenizer.tokenize(
+                    sentence)  # + " [SEP]")
+                indexed_tokens = self.tokenizer.convert_tokens_to_ids(
+                    tokenized_sent)
+
+                segments_ids = [i + 1] * len(tokenized_sent)
+
+                tokens_tensor = torch.tensor([indexed_tokens])
+                segments_tensors = torch.tensor([segments_ids])
+
+                outputs = self.model(tokens_tensor, segments_tensors)
+                # append last 5 layers
+                for j in range(5):
+                    with torch.no_grad():
+                        last_five_hidden_states = outputs[2][-5:][j][0]
+                        for elem in last_five_hidden_states:
+                            embd_set.append(elem.numpy())
+            return np.asarray(embd_set)
+
+    def petersen(self, p: int) -> float:
         """Estimate Petersen pop estimator."""
-        pt_estim: pt = pt(
-            {tuple(elem) for elem in cand},
-            {tuple(elem) for elem in ref},
-            k=self.k,
-            orig=self.orig)
-        return pt_estim.estimate()
+        assert self.data_org is not None
+        pt_estim: pt = pt(self.data_org, orig=self.orig)
+        return 1 - self.accuracy_loss(
+            pt_estim.estimate(),
+            p)
 
-    def schnabel(self, cand: list, ref: list) -> float:
+    def schnabel(self, p: int) -> float:
         """Estimate Schnabel pop estimator."""
-        sn_estim: sn = sn(
-            {tuple(elem) for elem in cand},
-            {tuple(elem) for elem in ref},
-            k=self.k,
-            orig=self.orig)
-        schn_div = sn_estim.estimate()
-        sn_estim: sn = sn(
-            {tuple(elem) for elem in ref},
-            {tuple(elem) for elem in cand},
-            k=self.k,
-            orig=self.orig)
-        schn_qul = sn_estim.estimate()
+        assert self.data_org is not None
+        sn_estim: sn = sn(self.data_org, orig=self.orig)
+        schn_div = 1 - self.accuracy_loss(
+            sn_estim.estimate(),
+            p)
+        self.data_org.switch_input()
+        sn_estim: sn = sn(self.data_org, orig=self.orig)
+        schn_qul = 1 - self.accuracy_loss(
+            sn_estim.estimate(),
+            p)
         return schn_div, schn_qul
 
-    def capture(self, cand: list, ref: list) -> float:
+    def capture(self, p: int) -> float:
         """Estimate CAPTURE pop estimator."""
-        cp_estim: cp = cp(
-            {tuple(elem) for elem in cand},
-            {tuple(elem) for elem in ref},
-            k=self.k,
-            orig=self.orig)
-        return cp_estim.estimate()
+        assert self.data_org is not None
+        cp_estim: cp = cp(self.data_org, orig=self.orig)
+        return 1 - self.accuracy_loss(
+            cp_estim.estimate(),
+            p)
 
-    def estimate(self, cand: list, ref: list) -> dict:
-        """Estimate all."""
+    def __estimate(self, cand: list, ref: list) -> dict:
         cand: np.ndarray = self.get_embds(cand)
         ref: np.ndarray = self.get_embds(ref)
 
+        self.data_org: do = do.DataOrg(
+            cand,
+            ref,
+            k=self.k,
+            verbose=self.verbose)
+
         p: int = len(cand) + len(ref)
 
-        me_petersen = 1 - self.accuracy_loss(
-            self.petersen(cand=cand, ref=ref), p)\
+        start_time = time.time()
+        me_petersen: float = self.petersen(p)\
             if 'Petersen' in self.metric else None
-        me_capture = 1 - self.accuracy_loss(
-            self.capture(cand=cand, ref=ref), p)\
+        if self.verbose:
+            print("--- %s took %s seconds ---"
+                  % ("Petersen", str(time.time() - start_time)))
+
+        # start_time = time.time()
+        me_capture: float = self.capture(p)\
             if 'CAPTURE' in self.metric else None
+        if self.verbose:
+            print("--- %s took %s seconds ---"
+                  % ("CAPTURE", str(time.time() - start_time)))
+
+        # start_time = time.time()
         me_schnabel_div,  me_schnabel_qul =\
-            self.schnabel(cand=cand, ref=ref)
-        me_schnabel_div = 1 - self.accuracy_loss(me_schnabel_div, p)\
+            self.schnabel(p)\
             if 'Schnabel' in self.metric else None
-        me_schnabel_qul = 1 - self.accuracy_loss(me_schnabel_qul, p)\
-            if 'Schnabel' in self.metric else None
+        if self.verbose:
+            print("--- %s took %s seconds ---"
+                  % ("Schnabel", str(time.time() - start_time)))
 
         self.result = {
             'Petersen': me_petersen,
@@ -115,43 +157,31 @@ class MarkEvaluate:
             'Schnabel_div': me_schnabel_div,
             'CAPTURE': me_capture
         }
-
         return self.result
 
-    def summary(self) -> None:
-        """Display results."""
-        # Colors for output
-        HEADER = '\033[95m'
-        OKBLUE = '\033[94m'
-        OKCYAN = '\033[96m'
-        OKGREEN = '\033[92m'
-        WARNING = '\033[93m'
-        FAIL = '\033[91m'
-        ENDC = '\033[0m'
-        BOLD = '\033[1m'
-        UNDERLINE = '\033[4m'
+    def estimate(self, cand: list, ref: list) -> dict:
+        """Estimate all."""
+        assert isinstance(cand, list)
+        assert isinstance(ref, list)
 
-        if self.result is None:
-            raise Exception(
-                ("ERROR:\n\t'-> No results to summarize."
-                    " Call ME.estimate(cand, ref) first."))
-
-        # Output
-        print("\n")
-        print(f"{HEADER}MARK-EVALUATE RESULTS{ENDC}")
-        print("\n\n")
-        print(
-            f"{OKCYAN}Interpretation{ENDC}: 0 poor quality <-> 1 good quality")
-        print("\n")
-        print(f"Petersen: {OKBLUE}{self.result['Petersen']}{ENDC}")
-        print(f"Schnabel: {OKBLUE}{self.result['Schnabel']}{ENDC} *")
-        print(f"CAPTURE:  {OKBLUE}{self.result['CAPTURE']}{ENDC}")
-        print("\n\n")
-        print("* Can be used to assess quality and diversity.")
-        print("Use (ref, cand) for quality and (cand, ref) for diversity.")
-        print(f"{BOLD}(Mordido, Meinel, 2020){ENDC}")
-        print(f"{BOLD}https://arxiv.org/abs/2010.04606{ENDC}")
-        print("\n")
+        if self.sntnc_lvl:
+            assert len(cand) == len(ref)
+            ret_dict = {
+                'Petersen': [],
+                'Schnabel_qul': [],
+                'Schnabel_div': [],
+                'CAPTURE': []
+            }
+            for c, r in zip(cand, ref):
+                # assert len(c) <= len(r)
+                estimated: dict = self.__estimate([c], [r])
+                ret_dict['Petersen'].append(estimated['Petersen'])
+                ret_dict['Schnabel_qul'].append(estimated['Schnabel_qul'])
+                ret_dict['Schnabel_div'].append(estimated['Schnabel_div'])
+                ret_dict['CAPTURE'].append(estimated['CAPTURE'])
+            return ret_dict
+        else:
+            return self.__estimate(cand=cand, ref=ref)
 
     @staticmethod
     def accuracy_loss(p_hat: int, p: int) -> float:

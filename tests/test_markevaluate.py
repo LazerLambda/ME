@@ -1,6 +1,7 @@
 import unittest
 import math
 import numpy as np
+import time
 
 import os
 import sys
@@ -10,6 +11,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from markevaluate import MarkEvaluate
 
 class TestMarkEvaluate(unittest.TestCase):
+
+    BERT_HIDDEN_SIZE = 768
 
     sentences0 = ['This framework provides an easy method to compute dense vector representations for sentences, paragraphs, and images.',\
         'This framework generates embeddings for each input sentence',\
@@ -25,6 +28,19 @@ class TestMarkEvaluate(unittest.TestCase):
         "South Africa has also paused its use, despite the Johnson & Johnson being its preferred vaccine because of its effectiveness against the South African variant",\
         "Both vaccines work by a similar method, known as adenoviral vectors.",\
         "Danish officials said that all 2.4 million doses of the AstraZeneca vaccine would be withdrawn until further notice."]
+
+    sentences01 = ['This framework provides an easy method to compute dense vector representations for sentences, paragraphs, and images.',\
+        'This framework generates embeddings for each input sentence']
+
+    sentences11o = ["This action will delay the country's vaccination programme for some time",\
+        "Drug watchdog the European Medicines Agency announced last week a possible link with clots but said the risk of dying of Covid-19 was much greater."]
+    
+
+    sentences11o = ["This.",\
+        "Drug."]
+
+    sentences11 = ["The move is expected to delay the country's vaccination programme by several weeks.",\
+        "Drug watchdog the European Medicines Agency last week announced a possible link with clots but said the risk of dying of Covid-19 was much greater."]
     # https://www.bbc.com/news/world-europe-56744474
 
     def test_markevaluate1(self):
@@ -77,6 +93,65 @@ class TestMarkEvaluate(unittest.TestCase):
         result = me.estimate(cand=self.sentences0, ref=self.sentences1)
         self.assertTrue(0 <= result['Schnabel_qul'] and result['Schnabel_qul'] <= 1, msg="Test different input with different topics and different lengths.")
         self.assertTrue(0 <= result['Schnabel_div'] and result['Schnabel_div'] <= 1, msg="Test different input with different topics and different lengths.")
+
+    def test_markevaluate6(self):
+
+        me = MarkEvaluate.MarkEvaluate(sent_transf=False)
+
+        ex_sample = [
+            "Hello World.",
+            "This is a test for the ME-Metrik."
+        ]
+
+        len_token = 0
+
+        for ex in ex_sample:
+            len_token += len(me.tokenizer.tokenize(ex))
+
+        len_token_set = len_token * 5
+        embds = me.get_embds(sentences=ex_sample)
+        x, y = embds.shape
+        assert x == len_token_set
+        assert y == self.BERT_HIDDEN_SIZE
+
+    def test_markevaluate7(self):
+
+        me = MarkEvaluate.MarkEvaluate(sent_transf=False)
+
+        ex_sample = self.sentences0
+
+        len_token = 0
+
+        for ex in ex_sample:
+            len_token += len(me.tokenizer.tokenize(ex))
+
+        len_token_set = len_token * 5
+        embds = me.get_embds(sentences=ex_sample)
+        x, y = embds.shape
+        assert x == len_token_set
+        assert y == self.BERT_HIDDEN_SIZE
+
+    # def test_markevaluate8(self):
+
+    #     me = MarkEvaluate.MarkEvaluate(sent_transf=False)
+    #     me.estimate(cand=self.sentences01, ref=self.sentences11)
+
+    
+    def test_markevaluate9(self):
+
+
+        me = MarkEvaluate.MarkEvaluate(sent_transf=False, sntnc_lvl=True)
+        re = me.estimate(cand=self.sentences01, ref=self.sentences11)
+
+    
+    def test_markevaluate10(self):  
+        me = MarkEvaluate.MarkEvaluate(sent_transf=False, sntnc_lvl=True)
+        re = me.estimate(cand=self.sentences11o, ref=self.sentences11)
+
+    def test_markevaluate11(self):  
+        me = MarkEvaluate.MarkEvaluate(sent_transf=False, sntnc_lvl=True, orig=True)
+        re = me.estimate(cand=self.sentences11o, ref=self.sentences11)
+
         
 
 if __name__ == '__main__':

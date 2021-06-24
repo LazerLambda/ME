@@ -10,12 +10,12 @@ class TestEstimate(unittest.TestCase):
 
     def test_estimate1(self):
         with self.assertRaises(Exception, msg="Test behavior with empty sets"):
-            Estimate.Estimate(set(), set(), k = 1)
+            Estimate.Estimate(set(), set(),None, None, k = 1)
 
     
     def test_estimate2(self):
         with self.assertRaises(Exception, msg="Test cardinality of input sets with respect to k."):
-            Estimate.Estimate(set([1,2]), set([3,4]), k = 3)
+            Estimate.Estimate(set([1,2]), set([3,4]),None, None, k = 3)
 
 
 

@@ -1,3 +1,5 @@
+"""Implementation of the CAPTURE estimator for Mark-Evaluate."""
+
 import itertools
 import math
 import numpy as np
@@ -6,28 +8,30 @@ import sys
 
 from scipy.optimize import minimize_scalar, OptimizeResult
 from scipy.special import factorial
-from .KNneighbors import KNneighbors as knn
 from .Estimate import Estimate
+from . import DataOrg as do
+
+import time
+
 
 class Capture(Estimate):
-    """ Computing the ME-CAPTURE-estimator
-    
+    """Computing the ME-CAPTURE-estimator.
+
     Class to provide the functions to compute the ME-CAPTURE-estimator.
     """
 
-
     def capture_total(self) -> int:
-        """ Capture Total
+        """Capture Total.
 
         "The total number of captures corresponds to the number of samples in S
-        and S′and their respectiveneighbors, as well as the number of samples 
+        and S′and their respectiveneighbors, as well as the number of samples
         in S inside the hypersphere of a givens′and vice-versa[...]"
         Mordido, Meinel, 2020: https://arxiv.org/abs/2010.04606
 
-        This function uses the properties of Theorem A.3. in Mordido and Meinel 
-        2020 by default. The respective cardinality of the k-nearest neighbor 
+        This function uses the properties of Theorem A.3. in Mordido and Meinel
+        2020 by default. The respective cardinality of the k-nearest neighbor
         set is only iterated in the outer loop.
-        The function proposed in the main part of the paper can be called by 
+        The function proposed in the main part of the paper can be called by
         setting the `orig` paramter to True when calling Capture().
 
         The complexity is O(n^2)
@@ -37,42 +41,60 @@ class Capture(Estimate):
         int
             total number of captures as described above
         """
+        assert len(self.cand) != 0 and len(self.ref) != 0
 
-        # Errorhandling
-        if len(self.set0) == 0 or len(self.set1) == 0:
-            return 0
+        acc: int = 0
+        for ic, s1 in enumerate(self.cand):
+            for ir, s0 in enumerate(self.ref):
 
-        acc : int = 0
-        for index1, s1 in enumerate(self.knn1.embds):
-            for index0, s0 in enumerate(self.knn0.embds):
-                
                 if self.orig:
                     # original
-                    acc += self.knn0.is_in_hypersphere(elem=index0, sample=np.asarray(list(self.knn1.get_knn_set(index1))), k=self.k)
-                    acc += self.knn1.is_in_hypersphere(elem=index1, sample=np.asarray(list(self.knn0.get_knn_set(index0))), k=self.k)
-                    acc += len(self.knn1.get_knn_set(index1)) + len(self.knn0.get_knn_set(index0))
+                    acc += self.data.is_in_hypersphere(
+                        elem=ir,
+                        sample=np.asarray(
+                            list(self.data.get_knn_set_cand(ic))),
+                        k=self.k)
+                    acc += self.data.is_in_hypersphere(
+                        elem=ic,
+                        sample=np.asarray(
+                            list(self.data.get_knn_set_ref(ir))),
+                        k=self.k
+                        )
+                    acc += (
+                        len(self.data.get_knn_set_cand(ic)) +
+                        len(self.data.get_knn_set_ref(ir))
+                    )
+
                 else:
                     # theorem based
-                    acc += self.knn0.in_kngbhd(index0, s1) + self.knn1.in_kngbhd(index1, s0)        
+                    acc += (
+                        self.data.in_knghbd_ref_cand(ir, ic) +
+                        self.data.in_knghbd_cand_ref(ic, ir)
+                    )
             if not self.orig:
                 # |NN_k(s, S)| = (k + 1)
                 acc += 2 * (self.k + 1)
         return acc
 
+    @staticmethod
+    def log_factorial(x: int) -> int:
+        """Compute log-factorial more efficient."""
+        return np.log(np.arange(1, (x + 1))).sum()
 
+    def maximize_likelihood(self, n: int = 10e2) -> float:
+        """Maximize likelihood.
 
-    def maximize_likelihood(self, n : int = 10e2) -> float:
-        """ Function that maximes the likelihood
-        
-        In this function the likelihood is defined and also iteratively maximized,
-        starting from len(set0) + len(self.set1) based on the assumption that 
-        we have a concatenation here.
+        In this function the likelihood is defined
+        and also iteratively maximized, starting from
+        len(set0) + len(self.set1) based on the assumption
+        that we have a concatenation here.
 
-        This function uses the properties of Theorem A.3. in Mordido and Meinel
-        2020 by default. It is assumed that M_T(S,S') = |S concat S'| instead of 
-        |S union S'|. 
-        The function proposed in the main part of the paper can be called by
-        setting the `orig` paramter to True when calling Capture().
+        This function uses the properties of Theorem A.3.
+        in Mordido and Meinel 2020 by default. It is assumed
+        that M_T(S,S') = |S concat S'| instead of |S union S'|.
+        The function proposed in the main part of the paper can
+        be called by setting the `orig` paramter to True when
+        calling Capture().
 
         The complexity is O(n).
 
@@ -81,59 +103,49 @@ class Capture(Estimate):
         n : int
             max iterations
         """
-
         # Difference between theorem based and original implementation
-        m_t : int = 0
-        t : int = 0  
+        m_t: int = 0
+        t: int = 0
         if self.orig:
-            m_t = len(self.set0.union(self.set1))
+            # original
+            m_t = len((set([tuple(e) for e in self.ref])).union(
+                (set([tuple(e) for e in self.cand]))))
         else:
-            m_t = len(self.set0) + len(self.set1)
+            # theorem based
+            m_t = len(self.ref) + len(self.cand)
 
-        if self.orig:
-            t = len(self.set0.union(self.set1))
-        else:
-            t = len(self.set0) + len(self.set1)
+        t = m_t
 
-        c_t : int = self.capture_total()
+        c_t: int = self.capture_total()
 
         def likelihood(p):
             # likelihood function
-            
-            def log_factorial(x : int) -> int:
-                # helper function to make it easier computing the log of a factorials
-                acc : int = 0
-                for e in np.arange(1, (x + 1)):
-                    acc += np.log(e)
-                return acc
 
-            y : float = (\
-                log_factorial(p) - log_factorial((p - m_t)) + \
-                c_t * np.log(c_t) + \
-                (t * p - c_t) * np.log(t * p - c_t) - \
-                t * p * np.log(t * p) \
+            y: float = (
+                self.log_factorial(p) - self.log_factorial((p - m_t)) +
+                c_t * np.log(c_t) +
+                (t * p - c_t) * np.log(t * p - c_t) -
+                t * p * np.log(t * p)
                 )
             return y
 
-
         if self.orig:
-            min_val : int = m_t if m_t > c_t else c_t
+            min_val: int = m_t if m_t > c_t else c_t
         else:
-            min_val : int = m_t
+            min_val: int = m_t
 
+        stop: int = n + min_val
 
         # Iterating over integers
-        x : np.ndarray = np.arange(start = min_val, stop = n, dtype = int)
-        x_range : pd.core.frame.Series = pd.Series(x).astype(int)
-        y : np.ndarray = x_range.map(likelihood).to_numpy()
-        result : int = x_range[np.argmax(y)]
+        x: np.ndarray = np.arange(start=min_val, stop=stop, dtype=int)
+        x_range: pd.core.frame.Series = pd.Series(x).astype(int)
+        y: np.ndarray = x_range.map(likelihood).to_numpy()
+        result: int = x_range[np.argmax(y)]
 
         return result
 
-
-
     def estimate(self) -> int:
-        """ Estimate function
+        """Estimate function.
 
         Computes the ME-CAPTURE-estimator.
 

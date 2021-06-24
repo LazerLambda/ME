@@ -5,3 +5,5 @@ markevaluate/__pycache__/
 .pytest_cache
 me.py.lprof
 profile.txt
+misc/
+bert_base_mnli/
