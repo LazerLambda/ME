@@ -184,7 +184,7 @@ class DataOrg:
             bar.finish()
 
         return bin_vec
-    
+
     def create_bin_matrix(
             self,
             samples: np.ndarray,
@@ -192,7 +192,7 @@ class DataOrg:
             knn_of_set: np.ndarray,
             kmaxs: np.ndarray) -> None:
         """Determine binary function for KNN.
-        
+
         Given two sets and the respective k-nn set
         of one set, this functions computes a 0/1
         matrix which sample from the first set lies
@@ -200,8 +200,8 @@ class DataOrg:
         the longest distance in the knn-set.
         m_{i,j} = f(s_i, KNN(s_j, S))
         """
-        bin_matrix: np.ndarray = np.zeros(
-            (len(samples),
+        bin_matrix: np.ndarray = np.zeros((
+            len(samples),
             len(set_to_check)))
 
         if self.verbose:
@@ -247,17 +247,17 @@ class DataOrg:
 
     def cand_in_hypsphr_knn(self):
         """Sum binary function for KNN (cand).
-        
+
         Ref set := S
-        \sum_{s \in S} \sum_{s' \in S'} f(s', KNN(s, S))
+        sum_{s in S} sum_{s' in S'} f(s', KNN(s, S))
         """
         return self.bin_mat_cand.sum(axis=0).sum()
 
     def ref_in_hypsphr_knn(self):
         """Sum binary function for KNN (ref).
-        
+
         Cand set := S'
-        \sum_{s \in S} \sum_{s' \in S'} f(s, KNN(s', S'))
+        sum_{s in S} sum_{s' in S'} f(s, KNN(s', S'))
         """
         return self.bin_mat_ref.sum(axis=0).sum()
 
@@ -353,11 +353,3 @@ class DataOrg:
             if dist <= mx:
                 return 1
         return 0
-
-
-        #   for s in S:
-        #       for s' in S':
-        #           knn_of_s' = kdt_S'.query(s')
-        #           for kn in knn_of_s':
-        #               if norm(s - kn) <= knn_of_s'.max:
-        #                   return 1  

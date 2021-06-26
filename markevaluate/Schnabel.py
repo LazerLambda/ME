@@ -110,7 +110,7 @@ class Schnabel(Estimate):
         if self.orig:
             acc += self.data.ref_in_hypsphr_knn()
         for ic, _ in enumerate(self.cand):
-            start_time = time.time()
+            # start_time = time.time()
             for ir, s0 in enumerate(self.ref):
                 if self.orig:
                     # original
@@ -124,7 +124,7 @@ class Schnabel(Estimate):
                 # theorem based
                 knn_tmp: set = self.data.get_knn_set_cand(ic)
                 acc += len(self.mark(ic + 1).
-                                intersection(knn_tmp))
+                           intersection(knn_tmp))
             # print("--- %s took %s seconds ---"
             #             % ("FOR LOOP", str(time.time() - start_time)))
         return acc
@@ -146,6 +146,6 @@ class Schnabel(Estimate):
         start_time = time.time()
         r: int = self.recapture()
         print("--- %s took %s seconds ---"
-                % ("recapture", str(time.time() - start_time)))
+              % ("recapture", str(time.time() - start_time)))
 
         return c * m / r if r != 0 else 0
