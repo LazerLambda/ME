@@ -21,7 +21,8 @@ class DataOrg:
         cand: np.ndarray,
         ref: np.ndarray,
         k: int = 1,
-        verbose: bool = False
+        verbose: bool = False,
+        orig: bool = False
     ) -> None:
         """Initialize data structures and compute knn."""
         if len(cand) == 0 or len(ref) == 0:
@@ -51,16 +52,24 @@ class DataOrg:
             np.asarray(list({tuple(elem) for elem in ref}))
 
         # can
-        # self.cand_knns_dist: np.ndarray =\
-        #     np.zeros((len(self.cand_embds), k + 1))
+        # array to store k-nearest-neighbors
+        self.cand_knnghrhd: np.ndarray =\
+            np.zeros((
+                len(self.cand_embds),
+                k + 1,
+                self.cand_embds.shape[1]))
         self.cand_knns_indx: np.ndarray =\
             np.zeros((len(self.cand_embds), k + 1))
         self.cand_kmaxs: np.ndarray =\
             np.zeros((len(self.cand_embds), 1))
 
         # ref
-        # self.ref_knns_dist: np.ndarray =\
-        #     np.zeros((len(self.ref_embds), k + 1))
+        # array to store k-nearest-neighbors
+        self.ref_knnghrhd: np.ndarray =\
+            np.zeros((
+                len(self.ref_embds),
+                k + 1,
+                self.ref_embds.shape[1]))
         self.ref_knns_indx: np.ndarray =\
             np.zeros((len(self.ref_embds), k + 1))
         self.ref_kmaxs: np.ndarray =\
@@ -86,9 +95,10 @@ class DataOrg:
                 [self.cand_embds[i]],
                 k=(k + 1))
 
-            # self.cand_knns_dist[i] = knns_dist[0]
             self.cand_knns_indx[i] = knns_indx[0]
             self.cand_kmaxs[i] = max(knns_dist[0])
+            self.cand_knnghrhd[i] =\
+                self.cand_embds[knns_indx]
             if self.verbose:
                 bar.next()
 
@@ -99,9 +109,10 @@ class DataOrg:
                 [self.ref_embds[i]],
                 k=(k + 1))
 
-            # self.ref_knns_dist[i] = knns_dist[0]
             self.ref_knns_indx[i] = knns_indx[0]
             self.ref_kmaxs[i] = max(knns_dist[0])
+            self.ref_knnghrhd[i] =\
+                self.ref_embds[knns_indx]
             if self.verbose:
                 bar.next()
 
@@ -113,16 +124,30 @@ class DataOrg:
             raise NotImplementedError("This section is not implemented!")
         else:
             # In-hypersphere-binary-matrix
-            self.bin_mat_cand: np.ndarray =\
+            self.bin_vec_cand: np.ndarray =\
                 self.create_bin_vec(
                     self.cand_embds,
                     self.ref_embds,
                     self.ref_kmaxs)
-            self.bin_mat_ref: np.ndarray =\
+            self.bin_vec_ref: np.ndarray =\
                 self.create_bin_vec(
                     self.ref_embds,
                     self.cand_embds,
                     self.cand_kmaxs)
+
+            if orig:
+                self.bin_mat_cand: np.ndarray =\
+                    self.create_bin_matrix(
+                        self.cand_embds,
+                        self.ref_embds,
+                        self.ref_knnghrhd,
+                        self.ref_kmaxs)
+                self.bin_mat_ref: np.ndarray =\
+                    self.create_bin_matrix(
+                        self.ref_embds,
+                        self.cand_embds,
+                        self.cand_knnghrhd,
+                        self.cand_kmaxs)
 
     def create_bin_vec(
             self,
@@ -140,13 +165,16 @@ class DataOrg:
 
         if self.verbose:
             bar = ShadyBar(
-                "Determining capture neighborhood",
+                "Determining capture neighborhood (Vektor)",
                 max=len(samples))
 
         for i, sample_outer in enumerate(samples):
             for j, sample_inner in enumerate(set_to_check):
                 dist: float = np.linalg.norm(
                     sample_inner - sample_outer)
+                # largest distance in the knn-set can
+                # only be the distance to the k-distant-
+                # neighbor
                 if dist <= kmaxs[j]:
                     bin_vec[i] = 1
                     break
@@ -156,6 +184,44 @@ class DataOrg:
             bar.finish()
 
         return bin_vec
+    
+    def create_bin_matrix(
+            self,
+            samples: np.ndarray,
+            set_to_check: np.ndarray,
+            knn_of_set: np.ndarray,
+            kmaxs: np.ndarray) -> None:
+        """Determine binary function for KNN.
+        
+        Given two sets and the respective k-nn set
+        of one set, this functions computes a 0/1
+        matrix which sample from the first set lies
+        closer to a sample from each knn-set than
+        the longest distance in the knn-set.
+        m_{i,j} = f(s_i, KNN(s_j, S))
+        """
+        bin_matrix: np.ndarray = np.zeros(
+            (len(samples),
+            len(set_to_check)))
+
+        if self.verbose:
+            bar = ShadyBar(
+                "Determining capture neighborhood (Matrix)",
+                max=len(samples) * len(set_to_check))
+
+        for i, sample in enumerate(samples):
+            for j, s_ in enumerate(set_to_check):
+                kmax: float = kmaxs[j]
+                for kn in knn_of_set[j]:
+                    if np.linalg.norm(sample - kn) <= kmax:
+                        bin_matrix[i][j] = 1
+                        continue
+                if self.verbose:
+                    bar.next()
+        if self.verbose:
+            bar.finish()
+
+        return bin_matrix
 
     # TODO rename cand_in_hypsphr
     def in_hypsphr_cand(self, i: int) -> int:
@@ -166,7 +232,7 @@ class DataOrg:
         k-nearest-neighborhood of a sample of
         the reference set.
         """
-        return self.bin_mat_cand[i]
+        return self.bin_vec_cand[i]
 
     # TODO rename ref_in_hypsphr
     def in_hypsphr_ref(self, i: int):
@@ -177,7 +243,23 @@ class DataOrg:
         k-nearest-neighborhood of a sample
         of the candidate set.
         """
-        return self.bin_mat_ref[i]
+        return self.bin_vec_ref[i]
+
+    def cand_in_hypsphr_knn(self):
+        """Sum binary function for KNN (cand).
+        
+        Ref set := S
+        \sum_{s \in S} \sum_{s' \in S'} f(s', KNN(s, S))
+        """
+        return self.bin_mat_cand.sum(axis=0).sum()
+
+    def ref_in_hypsphr_knn(self):
+        """Sum binary function for KNN (ref).
+        
+        Cand set := S'
+        \sum_{s \in S} \sum_{s' \in S'} f(s, KNN(s', S'))
+        """
+        return self.bin_mat_ref.sum(axis=0).sum()
 
     def in_knghbd_cand_ref(
             self,
@@ -223,8 +305,7 @@ class DataOrg:
         """
         return {
             tuple(elem)
-            for elem
-            in self.cand_embds[self.cand_knns_indx[i].astype(int)]}
+            for elem in self.cand_knnghrhd[i]}
 
     def get_knn_set_ref(self, i: int) -> set:
         """Get KNN from ref samples.
@@ -234,19 +315,28 @@ class DataOrg:
         """
         return {
             tuple(elem)
-            for elem
-            in self.ref_embds[self.ref_knns_indx[i].astype(int)]}
+            for elem in self.ref_knnghrhd[i]}
 
     def switch_input(self) -> None:
         """Switch candidate and reference set."""
         self.ref_embds, self.cand_embds =\
             self.cand_embds, self.ref_embds
+
+        self.bin_vec_ref, self.bin_vec_cand =\
+            self.bin_vec_cand, self.bin_vec_ref
+
         self.bin_mat_ref, self.bin_mat_cand =\
             self.bin_mat_cand, self.bin_mat_ref
+
+        self.ref_knnghrhd, self.cand_knnghrhd =\
+            self.cand_knnghrhd, self.ref_knnghrhd
+
         self.ref_knns_indx, self.cand_knns_indx =\
             self.cand_knns_indx, self.ref_knns_indx
+
         self.ref_kdt, self.cand_kdt =\
             self.cand_kdt, self.ref_kdt
+
         self.ref_kmaxs, self.cand_kmaxs =\
             self.cand_kmaxs, self.ref_kmaxs
 
@@ -263,3 +353,11 @@ class DataOrg:
             if dist <= mx:
                 return 1
         return 0
+
+
+        #   for s in S:
+        #       for s' in S':
+        #           knn_of_s' = kdt_S'.query(s')
+        #           for kn in knn_of_s':
+        #               if norm(s - kn) <= knn_of_s'.max:
+        #                   return 1  

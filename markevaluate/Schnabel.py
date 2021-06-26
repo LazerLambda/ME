@@ -16,6 +16,7 @@ class Schnabel(Estimate):
     Class to provide the functions to compute the ME-Schnabel-estimator.
     """
 
+    market_one: set = None
     marked_tmp: set = set()
 
     def mark(self, t: int) -> set:
@@ -30,10 +31,14 @@ class Schnabel(Estimate):
         assert t > 0, "t must be greater or equal than 1."
 
         if t == 1:
-            self.marked_tmp: set = set([tuple(e) for e in self.ref]).union(
-                {tuple(s1)
-                    for i, s1 in enumerate(self.cand)
-                    if int(self.data.in_hypsphr_cand(i))})
+            if self.market_one is None:
+                self.marked_tmp: set = set([tuple(e) for e in self.ref]).union(
+                    {tuple(s1)
+                        for i, s1 in enumerate(self.cand)
+                        if int(self.data.in_hypsphr_cand(i))})
+                self.market_one = self.marked_tmp
+            else:
+                self.marked_tmp = self.market_one
             return self.marked_tmp
         else:
             knns: set = self.data.get_knn_set_cand(t - 1)
@@ -43,19 +48,13 @@ class Schnabel(Estimate):
     def capture_sum(self) -> int:
         """Compute sum for capture computation."""
         acc: int = 0
-        for ic, _ in enumerate(self.cand):
-            for ir, s0 in enumerate(self.ref):
-                # Original vs theorem based implementation
-                if self.orig:
-                    # original
-                    acc += self.data.is_in_hypersphere(
-                        elem=tuple(s0),
-                        sample=np.asarray(
-                            list(self.data.get_knn_set_cand(ic))),
-                        k=self.k
-                    )
-                else:
-                    # theorem based
+        if self.orig:
+            # Original
+            acc += self.data.ref_in_hypsphr_knn()
+        else:
+            # theorem based
+            for ic, _ in enumerate(self.cand):
+                for ir, s0 in enumerate(self.ref):
                     acc += self.data.in_knghbd_ref_cand(ir, ic)
         return acc
 
@@ -108,18 +107,16 @@ class Schnabel(Estimate):
             total amount of recaptured samples
         """
         acc: int = 0
+        if self.orig:
+            acc += self.data.ref_in_hypsphr_knn()
         for ic, _ in enumerate(self.cand):
+            start_time = time.time()
             for ir, s0 in enumerate(self.ref):
                 if self.orig:
                     # original
-                    acc += self.data.is_in_hypersphere(
-                        elem=tuple(s0),
-                        sample=np.asarray(
-                            list(self.data.get_knn_set_cand(ic))),
-                        k=self.k)
+                    knn_tmp: set = self.data.get_knn_set_cand(ic)
                     acc += len(self.mark(ic + 1).
-                               intersection(
-                                    self.data.get_knn_set_cand(ic)))
+                               intersection(knn_tmp))
                 else:
                     # theorem based
                     acc += self.data.in_knghbd_ref_cand(ir, ic)
@@ -127,7 +124,9 @@ class Schnabel(Estimate):
                 # theorem based
                 knn_tmp: set = self.data.get_knn_set_cand(ic)
                 acc += len(self.mark(ic + 1).
-                           intersection(knn_tmp))
+                                intersection(knn_tmp))
+            # print("--- %s took %s seconds ---"
+            #             % ("FOR LOOP", str(time.time() - start_time)))
         return acc
 
     def estimate(self) -> float:
@@ -144,6 +143,9 @@ class Schnabel(Estimate):
         """
         c: int = self.capture()
         m: int = len(self.ref) + len(self.cand)
+        start_time = time.time()
         r: int = self.recapture()
+        print("--- %s took %s seconds ---"
+                % ("recapture", str(time.time() - start_time)))
 
         return c * m / r if r != 0 else 0

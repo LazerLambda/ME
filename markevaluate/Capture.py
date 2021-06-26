@@ -11,8 +11,6 @@ from scipy.special import factorial
 from .Estimate import Estimate
 from . import DataOrg as do
 
-import time
-
 
 class Capture(Estimate):
     """Computing the ME-CAPTURE-estimator.
@@ -44,34 +42,26 @@ class Capture(Estimate):
         assert len(self.cand) != 0 and len(self.ref) != 0
 
         acc: int = 0
-        for ic, s1 in enumerate(self.cand):
-            for ir, s0 in enumerate(self.ref):
+        if self.orig:
+            # original
+            acc += self.data.cand_in_hypsphr_knn() +\
+                self.data.ref_in_hypsphr_knn()
 
-                if self.orig:
-                    # original
-                    acc += self.data.is_in_hypersphere(
-                        elem=ir,
-                        sample=np.asarray(
-                            list(self.data.get_knn_set_cand(ic))),
-                        k=self.k)
-                    acc += self.data.is_in_hypersphere(
-                        elem=ic,
-                        sample=np.asarray(
-                            list(self.data.get_knn_set_ref(ir))),
-                        k=self.k
-                        )
-                    acc += (
-                        len(self.data.get_knn_set_cand(ic)) +
-                        len(self.data.get_knn_set_ref(ir))
-                    )
+            # \sum_{s \in S} \sum_{s' \in S'} |NN_k(s, S)|
+            # = |S'| * (k + 1)
 
-                else:
-                    # theorem based
+            # \sum_{s \in S} \sum_{s' \in S'} |NN_k(s', S')|
+            # = |S| * (k + 1)
+            acc += len(self.cand) * (self.k + 1) +\
+                len(self.ref) * (self.k + 1)
+        else:
+            # theorem based
+            for ic, s1 in enumerate(self.cand):
+                for ir, s0 in enumerate(self.ref):
                     acc += (
                         self.data.in_knghbd_ref_cand(ir, ic) +
                         self.data.in_knghbd_cand_ref(ic, ir)
                     )
-            if not self.orig:
                 # |NN_k(s, S)| = (k + 1)
                 acc += 2 * (self.k + 1)
         return acc

@@ -102,7 +102,7 @@ class MarkEvaluate:
         schn_div = 1 - self.accuracy_loss(
             sn_estim.estimate(),
             p)
-        self.data_org.switch_input()
+        # self.data_org.switch_input()
         sn_estim: sn = sn(self.data_org, orig=self.orig)
         schn_qul = 1 - self.accuracy_loss(
             sn_estim.estimate(),
@@ -125,7 +125,8 @@ class MarkEvaluate:
             cand,
             ref,
             k=self.k,
-            verbose=self.verbose)
+            verbose=self.verbose,
+            orig=self.orig)
 
         p: int = len(cand) + len(ref)
 

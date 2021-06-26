@@ -26,7 +26,7 @@ class Petersen(Estimate):
         int
             number of marked samples
         """
-        return len(self.ref) + self.data.bin_mat_cand.sum()
+        return len(self.ref) + self.data.bin_vec_cand.sum()
 
     def __capture(self) -> int:
         """Capture function.
@@ -42,7 +42,7 @@ class Petersen(Estimate):
         int
             number of captured samples
         """
-        return len(self.cand) + self.data.bin_mat_ref.sum()
+        return len(self.cand) + self.data.bin_vec_ref.sum()
 
     def __recapture(self) -> int:
         """Recapture function.
@@ -59,8 +59,8 @@ class Petersen(Estimate):
             number of recaptured samples
         """
         return (
-            self.data.bin_mat_ref.sum() +
-            self.data.bin_mat_cand.sum())
+            self.data.bin_vec_ref.sum() +
+            self.data.bin_vec_cand.sum())
 
     def estimate(self) -> float:
         """Estimate function.
