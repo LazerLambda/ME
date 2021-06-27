@@ -113,6 +113,7 @@ class Schnabel(Estimate):
                 if self.orig:
                     # original
                     knn_tmp: set = self.data.get_knn_set_cand(ic)
+                    # since ic starts at 0, ic must be incremented
                     acc += len(self.mark(ic + 1).
                                intersection(knn_tmp))
                 else:
