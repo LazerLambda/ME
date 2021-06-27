@@ -46,12 +46,16 @@ class DataOrg:
         self.verbose: bool = verbose
 
         # cand and ref as sets
-        self.cand_embds: np.ndarray =\
-            np.asarray(list({tuple(elem) for elem in cand}))
-        self.ref_embds: np.ndarray =\
-            np.asarray(list({tuple(elem) for elem in ref}))
+        # self.cand_embds: np.ndarray =\
+        #     np.asarray(list({tuple(elem) for elem in cand}))
+        # self.ref_embds: np.ndarray =\
+        #     np.asarray(list({tuple(elem) for elem in ref}))
 
-        # can
+        # cand and ref as sets
+        self.cand_embds: np.ndarray = np.unique(cand, axis=0)
+        self.ref_embds: np.ndarray = np.unique(ref, axis=0)
+
+        # cand
         # array to store k-nearest-neighbors
         self.cand_knnghrhd: np.ndarray =\
             np.zeros((
@@ -339,17 +343,3 @@ class DataOrg:
 
         self.ref_kmaxs, self.cand_kmaxs =\
             self.cand_kmaxs, self.ref_kmaxs
-
-    @staticmethod
-    def is_in_hypersphere(elem: tuple, sample: np.ndarray, k: int) -> int:
-        """Original binary function."""
-        kdt: KDTree = KDTree(sample, metric='euclidean')
-        for s in sample:
-            k_nn_dist, _ = kdt.query([s], k=(k + 1))
-
-            mx = np.amax(k_nn_dist)
-            dist = np.linalg.norm(elem - s)
-
-            if dist <= mx:
-                return 1
-        return 0

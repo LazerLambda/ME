@@ -15,45 +15,45 @@ from scipy import spatial
 class TestDataOrg(unittest.TestCase):
 
 
-    # def test_1(self):
+    def test_1(self):
 
-    #     s_len = int(10e4)
-    #     k = 2
-    #     dim = 768
+        s_len = int(10e4)
+        k = 2
+        dim = 768
 
-    #     arr0 = np.random.rand(int(100), dim)
-    #     arr1 = np.random.rand(int(100), dim)
+        arr0 = np.random.rand(int(100), dim)
+        arr1 = np.random.rand(int(100), dim)
 
-    #     do_test = do.DataOrg(arr0, arr1)
-    #     assert True
+        do_test = do.DataOrg(arr0, arr1)
+        assert True
 
-    # def test_2(self):
+    def test_2(self):
 
-    #     s_len = int(10e4)
-    #     k = 2
-    #     dim = 768
+        s_len = int(10e4)
+        k = 2
+        dim = 768
 
-    #     arr = np.random.rand(int(50), dim)
-    #     do_test = do.DataOrg(arr, arr)
+        arr = np.random.rand(int(50), dim)
+        do_test = do.DataOrg(arr, arr)
 
-    #     assert int(do_test.bin_vec_cand.sum()) == len(do_test.bin_vec_cand)
-    #     assert int(do_test.bin_vec_ref.sum()) == len(do_test.bin_vec_ref)
+        assert int(do_test.bin_vec_cand.sum()) == len(do_test.bin_vec_cand)
+        assert int(do_test.bin_vec_ref.sum()) == len(do_test.bin_vec_ref)
 
 
-    # def test_3(self):
+    def test_3(self):
 
-    #     s_len = int(10e4)
-    #     k = 2
-    #     dim = 768
-    #     start_time = time.time()
+        s_len = int(10e4)
+        k = 2
+        dim = 768
+        start_time = time.time()
 
-    #     arr0 = np.random.rand(int(100), dim)
-    #     arr1 = np.random.rand(int(100), dim)
+        arr0 = np.random.rand(int(100), dim)
+        arr1 = np.random.rand(int(100), dim)
 
-    #     do_test = do.DataOrg(arr0, arr1)
+        do_test = do.DataOrg(arr0, arr1)
 
-    #     assert int(do_test.bin_vec_cand.sum()) <= len(do_test.bin_vec_cand)
-    #     assert int(do_test.bin_vec_ref.sum()) <= len(do_test.bin_vec_ref)
+        assert int(do_test.bin_vec_cand.sum()) <= len(do_test.bin_vec_cand)
+        assert int(do_test.bin_vec_ref.sum()) <= len(do_test.bin_vec_ref)
 
     def test_4(self):
         s_len = int(10e4)
@@ -77,8 +77,8 @@ class TestDataOrg(unittest.TestCase):
         bin_mat_cand_sum = do_test.bin_mat_cand.sum(axis=0)
         bin_mat_ref_sum = do_test.bin_mat_ref.sum(axis=0)
 
-        assert (bin_mat_cand_sum == 3).all()
-        assert (bin_mat_ref_sum == 3).all()
+        assert (bin_mat_cand_sum >= 3).all()
+        assert (bin_mat_ref_sum >= 3).all()
 
     def test_6(self):
         k = 1

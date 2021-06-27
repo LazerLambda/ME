@@ -50,7 +50,7 @@ class TestSchnabel(unittest.TestCase):
         k = 1
 
         arr = np.random.rand(s_len, 2)
-        data_org = do.DataOrg(arr, arr,k=k)
+        data_org = do.DataOrg(arr, arr,k=k, orig=True)
         test_sn = sn.Schnabel(data_org, orig=True)
         self.assertGreaterEqual(test_sn.capture_sum(), (k + 1) * s_len)
 
@@ -59,7 +59,7 @@ class TestSchnabel(unittest.TestCase):
         k = 1 #random.randint(0, s_len - 1)
 
         arr = np.random.rand(s_len, 2)
-        data_org = do.DataOrg(arr, arr,k=k)
+        data_org = do.DataOrg(arr, arr,k=k, orig=True)
         test_sn = sn.Schnabel(data_org, orig=True)
         self.assertGreaterEqual(test_sn.capture_sum(), (k + 1) * s_len)
 

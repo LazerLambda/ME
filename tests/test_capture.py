@@ -26,14 +26,25 @@ class TestCapture(unittest.TestCase):
         self.assertEqual(test_capture.capture_total(), 4 * s_len * (k + 1), msg="Test Capture_T function, theorem based")
 
     def test_capture1_1(self):
-        # # TODO: change to random numbers
-        # ERROR 
         s_len = 5
         k = 1
         arr = np.random.rand(s_len, 2)
-        data_org: do = do.DataOrg(arr, arr)
+
+        data_org: do = do.DataOrg(arr, arr, orig=True)
         test_capture = Capture.Capture(data_org, orig=True)
-        self.assertGreaterEqual(test_capture.capture_total(), s_len ** 2 * (k + 1) + s_len ** 2 * (k + 1), msg="Test Capture_T function, original") 
+        exp_res = s_len ** 2 * (k + 1) + s_len ** 2 * (k + 1) + 2 * s_len * (k + 1)
+        self.assertGreaterEqual(test_capture.capture_total(), exp_res, msg="Test Capture_T function, original")
+    
+    def test_capture1_2(self):
+
+        arr = np.array([[1,1], [2, 2], [5,5], [6,6]])
+        s_len = 4
+        k = 1
+
+        data_org: do = do.DataOrg(arr, arr, orig=True)
+        test_capture = Capture.Capture(data_org, orig=True)
+        exp_res = s_len ** 2 * (k + 1) + s_len ** 2 * (k + 1) + 2 * s_len * (k + 1)
+        self.assertEqual(test_capture.capture_total(), exp_res, msg="Test Capture_T function, original") 
 
     def test_capture2(self):
         ## PROBLEM

@@ -48,12 +48,12 @@ class Capture(Estimate):
                 self.data.ref_in_hypsphr_knn()
 
             # \sum_{s \in S} \sum_{s' \in S'} |NN_k(s, S)|
-            # = |S'| * (k + 1)
+            # = |S| * |S'| * (k + 1)
 
             # \sum_{s \in S} \sum_{s' \in S'} |NN_k(s', S')|
-            # = |S| * (k + 1)
-            acc += len(self.cand) * (self.k + 1) +\
-                len(self.ref) * (self.k + 1)
+            # = |S| * |S'| * (k + 1)
+            acc += len(self.cand) * len(self.ref) * (self.k + 1) +\
+                len(self.ref) * len(self.cand) * (self.k + 1)
         else:
             # theorem based
             for ic, s1 in enumerate(self.cand):

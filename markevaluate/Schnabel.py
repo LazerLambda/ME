@@ -7,8 +7,6 @@ from sklearn.neighbors import KDTree
 from .Estimate import Estimate
 from . import DataOrg as do
 
-import time
-
 
 class Schnabel(Estimate):
     """Computing the ME-Schnabel-estimator.
@@ -143,9 +141,6 @@ class Schnabel(Estimate):
         """
         c: int = self.capture()
         m: int = len(self.ref) + len(self.cand)
-        start_time = time.time()
         r: int = self.recapture()
-        print("--- %s took %s seconds ---"
-              % ("recapture", str(time.time() - start_time)))
 
         return c * m / r if r != 0 else 0
