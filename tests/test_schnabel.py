@@ -116,7 +116,7 @@ class TestSchnabel(unittest.TestCase):
 
         
     def test_schnabel8(self):
-        s_len = 6 
+        s_len = 30 * 5
         k = 1
 
         arr = np.random.rand(s_len, 2)
@@ -125,7 +125,7 @@ class TestSchnabel(unittest.TestCase):
         self.assertEqual(test_sn.recapture(), len(arr) * (k + 1) * 2, msg="Test recapture function, theorem based")
     
     def test_schnabel8_1(self):
-        s_len = 6 
+        s_len = 200 * 5
         k = 1
 
         arr = np.random.rand(s_len, 2)

@@ -51,11 +51,12 @@ class DataOrg:
 
         # cand
         # array to store k-nearest-neighbors
-        self.cand_knnghrhd: np.ndarray =\
-            np.zeros((
-                len(self.cand_embds),
-                k + 1,
-                self.cand_embds.shape[1]))
+        # self.cand_knnghrhd: np.ndarray =\
+        #     np.zeros((
+        #         len(self.cand_embds),
+        #         k + 1,
+        #         self.cand_embds.shape[1]))
+        self.cand_knnghrhd: list = []
         self.cand_knns_indx: np.ndarray =\
             np.zeros((len(self.cand_embds), k + 1))
         self.cand_kmaxs: np.ndarray =\
@@ -63,11 +64,12 @@ class DataOrg:
 
         # ref
         # array to store k-nearest-neighbors
-        self.ref_knnghrhd: np.ndarray =\
-            np.zeros((
-                len(self.ref_embds),
-                k + 1,
-                self.ref_embds.shape[1]))
+        # self.ref_knnghrhd: np.ndarray =\
+        #     np.zeros((
+        #         len(self.ref_embds),
+        #         k + 1,
+        #         self.ref_embds.shape[1]))
+        self.ref_knnghrhd: list = []
         self.ref_knns_indx: np.ndarray =\
             np.zeros((len(self.ref_embds), k + 1))
         self.ref_kmaxs: np.ndarray =\
@@ -95,8 +97,11 @@ class DataOrg:
 
             self.cand_knns_indx[i] = knns_indx[0]
             self.cand_kmaxs[i] = max(knns_dist[0])
-            self.cand_knnghrhd[i] =\
-                self.cand_embds[knns_indx]
+            # self.cand_knnghrhd[i] =\
+            #     self.cand_embds[knns_indx]
+            self.cand_knnghrhd.append({
+                tuple(e) for e in self.cand_embds[knns_indx][0]
+            })
             if self.verbose:
                 bar.next()
 
@@ -109,8 +114,11 @@ class DataOrg:
 
             self.ref_knns_indx[i] = knns_indx[0]
             self.ref_kmaxs[i] = max(knns_dist[0])
-            self.ref_knnghrhd[i] =\
-                self.ref_embds[knns_indx]
+            # self.ref_knnghrhd[i] =\
+            #     self.ref_embds[knns_indx]
+            self.ref_knnghrhd.append({
+                tuple(e) for e in self.ref_embds[knns_indx][0]
+            })
             if self.verbose:
                 bar.next()
 
@@ -301,9 +309,10 @@ class DataOrg:
         Return set of k-nearest-neighbors for
         sample in cand set at position i.
         """
-        return {
-            tuple(elem)
-            for elem in self.cand_knnghrhd[i]}
+        # return {
+        #     tuple(elem)
+        #     for elem in self.cand_knnghrhd[i]}
+        return self.cand_knnghrhd[i]
 
     def get_knn_set_ref(self, i: int) -> set:
         """Get KNN from ref samples.
@@ -311,9 +320,10 @@ class DataOrg:
         Return set of k-nearest-neighbors for
         sample in ref set at position i.
         """
-        return {
-            tuple(elem)
-            for elem in self.ref_knnghrhd[i]}
+        # return {
+        #     tuple(elem)
+        #     for elem in self.ref_knnghrhd[i]}
+        return self.ref_knnghrhd[i]
 
     def switch_input(self) -> None:
         """Switch candidate and reference set."""
