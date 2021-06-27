@@ -7,6 +7,8 @@ from sklearn.neighbors import KDTree
 from .Estimate import Estimate
 from . import DataOrg as do
 
+import time
+
 
 class Schnabel(Estimate):
     """Computing the ME-Schnabel-estimator.
@@ -113,7 +115,8 @@ class Schnabel(Estimate):
                 if self.orig:
                     # original
                     knn_tmp: set = self.data.get_knn_set_cand(ic)
-                    acc += len(self.mark(ic + 1).
+                    m: set = self.mark(ic + 1)
+                    acc += len(m.
                                intersection(knn_tmp))
                 else:
                     # theorem based
@@ -123,8 +126,6 @@ class Schnabel(Estimate):
                 knn_tmp: set = self.data.get_knn_set_cand(ic)
                 acc += len(self.mark(ic + 1).
                            intersection(knn_tmp))
-            # print("--- %s took %s seconds ---"
-            #             % ("FOR LOOP", str(time.time() - start_time)))
         return acc
 
     def estimate(self) -> float:
