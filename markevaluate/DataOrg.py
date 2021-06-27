@@ -46,12 +46,6 @@ class DataOrg:
         self.verbose: bool = verbose
 
         # cand and ref as sets
-        # self.cand_embds: np.ndarray =\
-        #     np.asarray(list({tuple(elem) for elem in cand}))
-        # self.ref_embds: np.ndarray =\
-        #     np.asarray(list({tuple(elem) for elem in ref}))
-
-        # cand and ref as sets
         self.cand_embds: np.ndarray = np.unique(cand, axis=0)
         self.ref_embds: np.ndarray = np.unique(ref, axis=0)
 
