@@ -42,7 +42,6 @@ class DataOrg:
                     k)
             raise Exception(exc_str)
 
-        self.k: int = k
         self.verbose: bool = verbose
 
         # cand and ref as sets
@@ -87,6 +86,12 @@ class DataOrg:
         self.ref_kdt: KDTree = KDTree(self.ref_embds, metric='euclidean')
         if self.verbose:
             bar.next()
+
+        if len(self.cand_embds) < k + 1:
+            k = len(self.cand_embds) - 1
+
+        if len(self.ref_embds) < k + 1:
+            k = len(self.ref_embds) - 1
 
         # KDTree for candidate embeddings
         for i in range(len(self.cand_embds)):
@@ -154,6 +159,8 @@ class DataOrg:
                         self.cand_embds,
                         self.cand_knnghrhd,
                         self.cand_kmaxs)
+        
+        self.k: int = k
 
     def create_bin_vec(
             self,
