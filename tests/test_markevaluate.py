@@ -44,127 +44,138 @@ class TestMarkEvaluate(unittest.TestCase):
                    "Drug watchdog the European Medicines Agency last week announced a possible link with clots but said the risk of dying of Covid-19 was much greater."]
     # https://www.bbc.com/news/world-europe-56744474
 
-    # def test_markevaluate1(self):
+    def test_markevaluate1(self):
 
-    #     me = MarkEvaluate.MarkEvaluate()
-    #     self.assertEqual(me.estimate(cand=self.sentences0, ref=self.sentences0)['Petersen'], 1, msg="Test Petersen Estimator using Theorem A.1.")
+        me = MarkEvaluate.MarkEvaluate()
+        self.assertEqual(me.estimate(cand=self.sentences0, ref=self.sentences0)['Petersen'], 1, msg="Test Petersen Estimator using Theorem A.1.")
 
-    # def test_markevaluate2(self):
+    def test_markevaluate2(self):
 
-    #     me = MarkEvaluate.MarkEvaluate()
-    #     res = me.estimate(cand=self.sentences0, ref=self.sentences0)
-    #     self.assertEqual(res['Schnabel_qul'], 1, msg="Test Schnabel (quality) Estimator using Theorem A.2.")
-    #     self.assertEqual(res['Schnabel_div'], 1, msg="Test Schnabel (diversity) Estimator using Theorem A.2.")
+        me = MarkEvaluate.MarkEvaluate()
+        res = me.estimate(cand=self.sentences0, ref=self.sentences0)
+        self.assertEqual(res['Schnabel_qul'], 1, msg="Test Schnabel (quality) Estimator using Theorem A.2.")
+        self.assertEqual(res['Schnabel_div'], 1, msg="Test Schnabel (diversity) Estimator using Theorem A.2.")
 
-    # def test_markevaluate2_2(self):
+    def test_markevaluate2_2(self):
 
-    #     me = MarkEvaluate.MarkEvaluate(orig=True)
-    #     res = me.estimate(cand=self.sentences0, ref=self.sentences0)['Schnabel_qul']
-    #     self.assertTrue(0 <= res and res <= 1, msg="Test Schnabel (quality) Estimator (original).")
-    #     res = me.estimate(cand=self.sentences0, ref=self.sentences0)['Schnabel_div']
-    #     self.assertTrue(0 <= res and res <= 1, msg="Test Schnabel (diversity) Estimator (original).")
+        me = MarkEvaluate.MarkEvaluate(orig=True)
+        res = me.estimate(cand=self.sentences0, ref=self.sentences0)['Schnabel_qul']
+        self.assertTrue(0 <= res and res <= 1, msg="Test Schnabel (quality) Estimator (original).")
+        res = me.estimate(cand=self.sentences0, ref=self.sentences0)['Schnabel_div']
+        self.assertTrue(0 <= res and res <= 1, msg="Test Schnabel (diversity) Estimator (original).")
 
-    # def test_markevaluate3(self):
+    def test_markevaluate3(self):
 
-    #     me = MarkEvaluate.MarkEvaluate()
-    #     self.assertEqual(me.estimate(cand=self.sentences0, ref=self.sentences0,)['Schnabel_qul'], 1, msg="Test Schnabel Estimator using Theorem A.2.")
+        me = MarkEvaluate.MarkEvaluate()
+        self.assertEqual(me.estimate(cand=self.sentences0, ref=self.sentences0,)['Schnabel_qul'], 1, msg="Test Schnabel Estimator using Theorem A.2.")
 
-    # def test_markevaluate3_3(self):
+    def test_markevaluate3_3(self):
 
-    #     me = MarkEvaluate.MarkEvaluate(orig=True)
-    #     res = me.estimate(cand=self.sentences0, ref=self.sentences0)['Schnabel_qul']
-    #     self.assertTrue(0 <= res and res <= 1, msg="Test Schnabel (quality) Estimator (original).")
-    #     res = me.estimate(cand=self.sentences0, ref=self.sentences0)['Schnabel_div']
-    #     self.assertTrue(0 <= res and res <= 1, msg="Test Schnabel (diversity) Estimator (original).")
+        me = MarkEvaluate.MarkEvaluate(orig=True)
+        res = me.estimate(cand=self.sentences0, ref=self.sentences0)['Schnabel_qul']
+        self.assertTrue(0 <= res and res <= 1, msg="Test Schnabel (quality) Estimator (original).")
+        res = me.estimate(cand=self.sentences0, ref=self.sentences0)['Schnabel_div']
+        self.assertTrue(0 <= res and res <= 1, msg="Test Schnabel (diversity) Estimator (original).")
 
-    # def test_markevaluate4(self):
+    def test_markevaluate4(self):
 
-    #     me = MarkEvaluate.MarkEvaluate()
-    #     self.assertEqual(me.estimate(cand=self.sentences0, ref=self.sentences0)['CAPTURE'], 1, msg="Test CAPTURE Estimator using Theorem A.3.")
+        me = MarkEvaluate.MarkEvaluate()
+        self.assertEqual(me.estimate(cand=self.sentences0, ref=self.sentences0)['CAPTURE'], 1, msg="Test CAPTURE Estimator using Theorem A.3.")
 
-    # def test_markevaluate4_4(self):
+    def test_markevaluate4_4(self):
 
-    #     me = MarkEvaluate.MarkEvaluate(orig=True)
-    #     res = me.estimate(cand=self.sentences0, ref=self.sentences0)['CAPTURE']
-    #     self.assertTrue(0 <= res and res <= 1, msg="Test CAPTURE Estimator (original).")
+        me = MarkEvaluate.MarkEvaluate(orig=True)
+        res = me.estimate(cand=self.sentences0, ref=self.sentences0)['CAPTURE']
+        self.assertTrue(0 <= res and res <= 1, msg="Test CAPTURE Estimator (original).")
 
-    # def test_markevaluate5(self):
+    def test_markevaluate5(self):
 
-    #     me = MarkEvaluate.MarkEvaluate()
-    #     result = me.estimate(cand=self.sentences0, ref=self.sentences1)
-    #     self.assertTrue(0 <= result['Schnabel_qul'] and result['Schnabel_qul'] <= 1, msg="Test different input with different topics and different lengths.")
-    #     self.assertTrue(0 <= result['Schnabel_div'] and result['Schnabel_div'] <= 1, msg="Test different input with different topics and different lengths.")
+        me = MarkEvaluate.MarkEvaluate()
+        result = me.estimate(cand=self.sentences0, ref=self.sentences1)
+        self.assertTrue(0 <= result['Schnabel_qul'] and result['Schnabel_qul'] <= 1, msg="Test different input with different topics and different lengths.")
+        self.assertTrue(0 <= result['Schnabel_div'] and result['Schnabel_div'] <= 1, msg="Test different input with different topics and different lengths.")
 
-    # def test_markevaluate6(self):
+    def test_markevaluate6(self):
+
+        me = MarkEvaluate.MarkEvaluate(sent_transf=False)
+
+        ex_sample = [
+            "Hello World.",
+            "This is a test for the ME-Metrik."
+        ]
+
+        len_token = 0
+
+        for ex in ex_sample:
+            len_token += len(me.tokenizer.tokenize(ex))
+
+        len_token_set = len_token * 5
+        embds = me.get_embds(sentences=ex_sample)
+        x, y = embds.shape
+        assert x == len_token_set
+        assert y == self.BERT_HIDDEN_SIZE
+
+    def test_markevaluate7(self):
+
+        me = MarkEvaluate.MarkEvaluate(sent_transf=False)
+
+        ex_sample = self.sentences0
+
+        len_token = 0
+
+        for ex in ex_sample:
+            len_token += len(me.tokenizer.tokenize(ex))
+
+        len_token_set = len_token * 5
+        embds = me.get_embds(sentences=ex_sample)
+        x, y = embds.shape
+        assert x == len_token_set
+        assert y == self.BERT_HIDDEN_SIZE
+
+    # def test_markevaluate8(self):
 
     #     me = MarkEvaluate.MarkEvaluate(sent_transf=False)
+    #     me.estimate(cand=self.sentences01, ref=self.sentences11)
 
-    #     ex_sample = [
-    #         "Hello World.",
-    #         "This is a test for the ME-Metrik."
-    #     ]
+    def test_markevaluate9(self):
 
-    #     len_token = 0
+        me = MarkEvaluate.MarkEvaluate(sent_transf=False, sntnc_lvl=True)
+        re = me.estimate(cand=self.sentences01, ref=self.sentences11)
 
-    #     for ex in ex_sample:
-    #         len_token += len(me.tokenizer.tokenize(ex))
+    def test_markevaluate10(self):
+        me = MarkEvaluate.MarkEvaluate(sent_transf=False, sntnc_lvl=True)
+        re = me.estimate(cand=self.sentences11o, ref=self.sentences11)
 
-    #     len_token_set = len_token * 5
-    #     embds = me.get_embds(sentences=ex_sample)
-    #     x, y = embds.shape
-    #     assert x == len_token_set
-    #     assert y == self.BERT_HIDDEN_SIZE
+    def test_markevaluate11(self):
+        me = MarkEvaluate.MarkEvaluate(sent_transf=False, sntnc_lvl=True, orig=True)
+        re = me.estimate(cand=self.sentences11o, ref=self.sentences11)
 
-    # def test_markevaluate7(self):
+    def test_markevaluate12(self):
+        me = MarkEvaluate.MarkEvaluate(sent_transf=False, sntnc_lvl=True, orig=True)
+        re = me.estimate(cand=self.sentences0, ref=self.sentences1)
 
-    #     me = MarkEvaluate.MarkEvaluate(sent_transf=False)
+    def test_markevaluate13(self):
+        s0 = [
+            "This framework provides an easy method to compute dense vector representations for sentences, paragraphs, and images."
+        ]
+        s1 = [
+            "The move is expected to delay the country's vaccination programme by several weeks."
+        ]
+        me = MarkEvaluate.MarkEvaluate(sent_transf=False, sntnc_lvl=True, orig=True)
+        re = me.estimate(cand=s0, ref=s1)
 
-    #     ex_sample = self.sentences0
-
-    #     len_token = 0
-
-    #     for ex in ex_sample:
-    #         len_token += len(me.tokenizer.tokenize(ex))
-
-    #     len_token_set = len_token * 5
-    #     embds = me.get_embds(sentences=ex_sample)
-    #     x, y = embds.shape
-    #     assert x == len_token_set
-    #     assert y == self.BERT_HIDDEN_SIZE
-
-    # # def test_markevaluate8(self):
-
-    # #     me = MarkEvaluate.MarkEvaluate(sent_transf=False)
-    # #     me.estimate(cand=self.sentences01, ref=self.sentences11)
-
-    # def test_markevaluate9(self):
-
-    #     me = MarkEvaluate.MarkEvaluate(sent_transf=False, sntnc_lvl=True)
-    #     re = me.estimate(cand=self.sentences01, ref=self.sentences11)
-
-    # def test_markevaluate10(self):
-    #     me = MarkEvaluate.MarkEvaluate(sent_transf=False, sntnc_lvl=True)
-    #     re = me.estimate(cand=self.sentences11o, ref=self.sentences11)
-
-    # def test_markevaluate11(self):
-    #     me = MarkEvaluate.MarkEvaluate(sent_transf=False, sntnc_lvl=True, orig=True)
-    #     re = me.estimate(cand=self.sentences11o, ref=self.sentences11)
-
-    # def test_markevaluate12(self):
-    #     me = MarkEvaluate.MarkEvaluate(sent_transf=False, sntnc_lvl=True, orig=True)
-    #     re = me.estimate(cand=self.sentences0, ref=self.sentences1)
-
-    # def test_markevaluate13(self):
+    # def test_markevaluate14(self):
     #     s0 = [
     #         "This framework provides an easy method to compute dense vector representations for sentences, paragraphs, and images."
     #     ]
     #     s1 = [
     #         "The move is expected to delay the country's vaccination programme by several weeks."
     #     ]
-    #     me = MarkEvaluate.MarkEvaluate(sent_transf=False, sntnc_lvl=True, orig=True)
-    #     re = me.estimate(cand=s0, ref=s1)
+    #     me = MarkEvaluate.MarkEvaluate(
+    #         sent_transf=False, sntnc_lvl=True, orig=True)
+    #     re = me.estimate(cand=self.sent_r_0, ref=self.sent_r_1)
 
-    def test_markevaluate14(self):
+    def test_markevaluate15(self):
         s0 = [
             "This framework provides an easy method to compute dense vector representations for sentences, paragraphs, and images."
         ]
@@ -172,8 +183,10 @@ class TestMarkEvaluate(unittest.TestCase):
             "The move is expected to delay the country's vaccination programme by several weeks."
         ]
         me = MarkEvaluate.MarkEvaluate(
-            sent_transf=False, sntnc_lvl=True, orig=True)
-        re = me.estimate(cand=self.sent_r_0, ref=self.sent_r_1)
+            sent_transf=True)
+        re = me.estimate(cand=s0, ref=s1)
+        assert me.data_org.k == 0
+        
 
     sent_r_0 = ['In broiling heat on the western tip of Croatia, Patrick Vieira is demanding that little bit more from his young Manchester City players.',
         '‘Come on, come on, come on,’ he urges, with increasing cadence, as his elite development squad — or reserve team, in old money — play a two-touch, six-a-side game.',
