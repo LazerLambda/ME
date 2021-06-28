@@ -87,6 +87,7 @@ class DataOrg:
         if self.verbose:
             bar.next()
 
+        # Adapt size k to the actual length of cand and ref
         if len(self.cand_embds) < k + 1:
             k = len(self.cand_embds) - 1
 
