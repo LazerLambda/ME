@@ -21,7 +21,7 @@ class TestMarkEvaluate(unittest.TestCase):
                   'The quick brown fox jumps over the lazy dog.',
                   'This naming convention informs the test runner about which methods represent tests',
                   'The remainder of the documentation explores the full feature set from first principles.',
-                  'With this framework, one is able to test these metrics in an exhausitve way.'] * 3
+                  'With this framework, one is able to test these metrics in an exhausitve way.']
 
     sentences1 = ["The move is expected to delay the country's vaccination programme by several weeks.",
                   "Drug watchdog the European Medicines Agency last week announced a possible link with clots but said the risk of dying of Covid-19 was much greater.",
@@ -29,7 +29,7 @@ class TestMarkEvaluate(unittest.TestCase):
                   "Most have now resumed vaccinations with AstraZeneca, but often with limits to older age groups.",
                   "South Africa has also paused its use, despite the Johnson & Johnson being its preferred vaccine because of its effectiveness against the South African variant",
                   "Both vaccines work by a similar method, known as adenoviral vectors.",
-                  "Danish officials said that all 2.4 million doses of the AstraZeneca vaccine would be withdrawn until further notice."] * 3
+                  "Danish officials said that all 2.4 million doses of the AstraZeneca vaccine would be withdrawn until further notice."]
 
     sentences01 = ['This framework provides an easy method to compute dense vector representations for sentences, paragraphs, and images.',
                    'This framework generates embeddings for each input sentence']
