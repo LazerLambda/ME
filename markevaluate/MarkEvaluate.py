@@ -68,10 +68,17 @@ class MarkEvaluate:
 
             for i, sentence in enumerate(sentences):
 
+                # Tokenizing
                 tokenized_sent = self.tokenizer.tokenize(
                     sentence)  # + " [SEP]")
                 indexed_tokens = self.tokenizer.convert_tokens_to_ids(
                     tokenized_sent)
+
+                # Reduce sentences to a length, the BERT model can 
+                # use them
+                if len(tokenized_sent) > 512 or len(indexed_tokens) > 512:
+                    tokenized_sent = tokenized_sent[:512]
+                    indexed_tokens = indexed_tokens[:512]
 
                 segments_ids = [i + 1] * len(tokenized_sent)
 
@@ -79,9 +86,12 @@ class MarkEvaluate:
                 segments_tensors = torch.tensor([segments_ids])
 
                 outputs = self.model(tokens_tensor, segments_tensors)
+
                 # append last 5 layers
                 for j in range(5):
                     with torch.no_grad():
+                        # access last the j-th embedding from the last 
+                        # five layers
                         last_five_hidden_states = outputs[2][-5:][j][0]
                         for elem in last_five_hidden_states:
                             embd_set.append(elem.numpy())
