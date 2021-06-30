@@ -104,9 +104,12 @@ class Capture(Estimate):
             # theorem based
             m_t = len(self.ref) + len(self.cand)
 
-        t = m_t
-
         c_t: int = self.capture_total()
+
+        if self.orig:
+            t = m_t if m_t > c_t else c_t
+        else:
+            t = m_t
 
         def likelihood(p):
             # likelihood function
