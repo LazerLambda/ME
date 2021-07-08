@@ -43,6 +43,7 @@ class DataOrg:
             raise Exception(exc_str)
 
         self.verbose: bool = verbose
+        self.orig: bool = orig
 
         # cand and ref as sets
         self.cand_embds: np.ndarray = np.unique(cand, axis=0)
@@ -341,9 +342,6 @@ class DataOrg:
         self.bin_vec_ref, self.bin_vec_cand =\
             self.bin_vec_cand, self.bin_vec_ref
 
-        self.bin_mat_ref, self.bin_mat_cand =\
-            self.bin_mat_cand, self.bin_mat_ref
-
         self.ref_knnghrhd, self.cand_knnghrhd =\
             self.cand_knnghrhd, self.ref_knnghrhd
 
@@ -355,3 +353,7 @@ class DataOrg:
 
         self.ref_kmaxs, self.cand_kmaxs =\
             self.cand_kmaxs, self.ref_kmaxs
+
+        if self.orig:
+            self.bin_mat_ref, self.bin_mat_cand =\
+                self.bin_mat_cand, self.bin_mat_ref

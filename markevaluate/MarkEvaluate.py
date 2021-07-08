@@ -98,16 +98,16 @@ class MarkEvaluate:
     def schnabel(self, p: int) -> float:
         """Estimate Schnabel pop estimator."""
         assert self.data_org is not None
-        sn_estim: sn = sn(self.data_org, orig=self.orig)
-        schn_div = 1 - self.accuracy_loss(
-            sn_estim.estimate(),
-            p)
-        # self.data_org.switch_input()
+        # sn_estim: sn = sn(self.data_org, orig=self.orig)
+        # schn_div = 1 - self.accuracy_loss(
+        #     sn_estim.estimate(),
+        #     p)
+        self.data_org.switch_input()
         sn_estim: sn = sn(self.data_org, orig=self.orig)
         schn_qul = 1 - self.accuracy_loss(
             sn_estim.estimate(),
             p)
-        return schn_div, schn_qul
+        return -1, schn_qul
 
     def capture(self, p: int) -> float:
         """Estimate CAPTURE pop estimator."""
@@ -131,18 +131,18 @@ class MarkEvaluate:
         p: int = len(cand) + len(ref)
 
         start_time = time.time()
-        me_petersen: float = self.petersen(p)\
-            if 'Petersen' in self.metric else None
-        if self.verbose:
-            print("--- %s took %s seconds ---"
-                  % ("Petersen", str(time.time() - start_time)))
+        # me_petersen: float = self.petersen(p)\
+        #     if 'Petersen' in self.metric else None
+        # if self.verbose:
+        #     print("--- %s took %s seconds ---"
+        #           % ("Petersen", str(time.time() - start_time)))
 
-        # start_time = time.time()
-        me_capture: float = self.capture(p)\
-            if 'CAPTURE' in self.metric else None
-        if self.verbose:
-            print("--- %s took %s seconds ---"
-                  % ("CAPTURE", str(time.time() - start_time)))
+        # # start_time = time.time()
+        # me_capture: float = self.capture(p)\
+        #     if 'CAPTURE' in self.metric else None
+        # if self.verbose:
+        #     print("--- %s took %s seconds ---"
+        #           % ("CAPTURE", str(time.time() - start_time)))
 
         # start_time = time.time()
         me_schnabel_div,  me_schnabel_qul =\
@@ -153,10 +153,10 @@ class MarkEvaluate:
                   % ("Schnabel", str(time.time() - start_time)))
 
         self.result = {
-            'Petersen': me_petersen,
+            'Petersen': -1,
             'Schnabel_qul': me_schnabel_qul,
             'Schnabel_div': me_schnabel_div,
-            'CAPTURE': me_capture
+            'CAPTURE': -1
         }
         return self.result
 
