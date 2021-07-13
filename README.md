@@ -21,6 +21,13 @@ Metric can be used in BERT-version and SBERT-version:
     me_sbert.estimate(cand=cand, ref=ref)
 ```
 
+The original version can be used by setting the original parameter to true `orig=True`
+```python
+    # orig BERT
+    me_bert: ME = ME(sent_transf=False, sntnc_lvl=True, orig=True)
+    # orig SBERT
+    me_bert: ME = ME(orig=True)
+``` 
 
 ## Tests:
 ```make test``` 
