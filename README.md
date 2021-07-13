@@ -22,6 +22,7 @@ Metric can be used in BERT-version and SBERT-version:
 ```
 
 The original version can be used by setting the original parameter to true `orig=True`
+
 ```python
     # orig BERT
     me_bert: ME = ME(sent_transf=False, sntnc_lvl=True, orig=True)
