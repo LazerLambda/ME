@@ -15,13 +15,37 @@ from . import DataOrg as do
 
 
 class MarkEvaluate:
-    """Main class for Mark-Evaluate."""
+    """Main class for Mark-Evaluate.
+
+    Parameter
+    ---------
+    metric : list
+        list of parameters to be computed. List can consist
+        of 'Petersen', 'Schnabel' and / or 'CAPTURE'
+    model_str : str
+        bert model identifier string
+    orig : bool
+        Boolean value whether original or theorem-based
+        version is to be used
+    k : int:
+        integer defining the k-nearest neighborhood
+    sent_transform : bool
+        boolean value determining if SBERT is used
+    verbose : bool
+        boolean value determining if progress is to be printed
+    sntnc_lvl : bool
+        boolean value determining if score is computed for
+        the whole corpus (False, only useful for SBERT)
+        or for each sentence (True)
+    """
+
+    # TODO pass lists of sentences as lists withtout setting parameter
+    # TODO documentation
 
     def __init__(
             self,
             metric: list = ["Schnabel", "Petersen", "CAPTURE"],
             model_str: str = 'bert-base-nli-mean-tokens',
-            quality: str = "diversity",
             orig: bool = False,
             k: int = 1,
             sent_transf: bool = True,
@@ -51,7 +75,6 @@ class MarkEvaluate:
 
         self.k: int = k
         self.orig: bool = orig
-        self.quality: str = quality
         self.sent_transf: bool = sent_transf
         self.verbose: bool = verbose
         self.sntnc_lvl: bool = sntnc_lvl
@@ -74,7 +97,7 @@ class MarkEvaluate:
                 indexed_tokens = self.tokenizer.convert_tokens_to_ids(
                     tokenized_sent)
 
-                # Reduce sentences to a length, the BERT model can 
+                # Reduce sentences to a length, the BERT model can
                 # use them
                 if len(tokenized_sent) > 512 or len(indexed_tokens) > 512:
                     tokenized_sent = tokenized_sent[:512]
@@ -90,7 +113,7 @@ class MarkEvaluate:
                 # append last 5 layers
                 for j in range(5):
                     with torch.no_grad():
-                        # access last the j-th embedding from the last 
+                        # access last the j-th embedding from the last
                         # five layers
                         last_five_hidden_states = outputs[2][-5:][j][0]
                         for elem in last_five_hidden_states:
@@ -157,7 +180,7 @@ class MarkEvaluate:
         # start_time = time.time()
         me_schnabel_div,  me_schnabel_qul =\
             self.schnabel(p)\
-            if 'Schnabel' in self.metric else None
+            if 'Schnabel' in self.metric else None, None
         if self.verbose:
             print("--- %s took %s seconds ---"
                   % ("Schnabel", str(time.time() - start_time)))
