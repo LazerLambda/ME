@@ -56,6 +56,7 @@ class MarkEvaluate:
 
         Defining whether to use SBERT or BERT.
         """
+        assert metric == ['Petersen'], "\n\t'-> Only 'Petersen' is supported!"
         self.metric: list = metric
         self.model: any = None
         self.tokenizer: any = None
@@ -111,9 +112,10 @@ class MarkEvaluate:
                 outputs = self.model(tokens_tensor, segments_tensors)
 
                 # append last 5 layers
-                for j in range(5):
-                    with torch.no_grad():
-                        # access last the j-th embedding from the last
+                with torch.no_grad():
+                    for j in range(5):
+                        outputs = self.model(tokens_tensor, segments_tensors)
+                        # access last the j-th embedding from the last 
                         # five layers
                         last_five_hidden_states = outputs[2][-5:][j][0]
                         for elem in last_five_hidden_states:
