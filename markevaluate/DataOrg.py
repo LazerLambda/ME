@@ -6,7 +6,7 @@ import sys
 
 from progress.bar import ShadyBar
 from typing import Tuple
-from sklearn.neighbors import KDTree
+from sklearn.neighbors import BallTree
 
 
 class DataOrg:
@@ -80,11 +80,11 @@ class DataOrg:
                 'Constructing data structure',
                 max=(len(self.cand_embds) + len(self.ref_embds) + 2))
 
-        self.cand_kdt: KDTree = KDTree(self.cand_embds, metric='euclidean')
+        self.cand_kdt: BallTree = BallTree(self.cand_embds, metric='euclidean')
         if self.verbose:
             bar.next()
 
-        self.ref_kdt: KDTree = KDTree(self.ref_embds, metric='euclidean')
+        self.ref_kdt: BallTree = BallTree(self.ref_embds, metric='euclidean')
         if self.verbose:
             bar.next()
 
@@ -95,7 +95,7 @@ class DataOrg:
         if len(self.ref_embds) < k + 1:
             k = len(self.ref_embds) - 1
 
-        # KDTree for candidate embeddings
+        # BallTree for candidate embeddings
         for i in range(len(self.cand_embds)):
 
             knns_dist, knns_indx = self.cand_kdt.query(
@@ -112,7 +112,7 @@ class DataOrg:
             if self.verbose:
                 bar.next()
 
-        # KDTree for reference embeddings
+        # BallTree for reference embeddings
         for i in range(len(self.ref_embds)):
 
             knns_dist, knns_indx = self.ref_kdt.query(
