@@ -9,8 +9,6 @@ import time
 from sentence_transformers import SentenceTransformer
 from transformers import BertTokenizer, BertModel
 from .Petersen import Petersen as pt
-from .Schnabel import Schnabel as sn
-from .Capture import Capture as cp
 from . import DataOrg as do
 
 
@@ -44,7 +42,7 @@ class MarkEvaluate:
 
     def __init__(
             self,
-            metric: list = ["Schnabel", "Petersen", "CAPTURE"],
+            metric: list = ["Petersen"],
             model_str: str = 'bert-base-nli-mean-tokens',
             orig: bool = False,
             k: int = 1,
