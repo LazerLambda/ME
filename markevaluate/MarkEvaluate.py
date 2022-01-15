@@ -206,13 +206,20 @@ class MarkEvaluate:
                 'Schnabel_div': [],
                 'CAPTURE': []
             }
+            # Iterate over each sentence and compute each score
             for c, r in zip(cand, ref):
-                # assert len(c) <= len(r)
-                estimated: dict = self.__estimate([c], [r])
-                ret_dict['Petersen'].append(estimated['Petersen'])
-                ret_dict['Schnabel_qul'].append(estimated['Schnabel_qul'])
-                ret_dict['Schnabel_div'].append(estimated['Schnabel_div'])
-                ret_dict['CAPTURE'].append(estimated['CAPTURE'])
+                # Return 0, iff one sentence is empty
+                if len(c.strip()) == 0 or len(r.strip()) == 0:
+                    ret_dict['Petersen'].append(0)
+                    ret_dict['Schnabel_qul'].append(0)
+                    ret_dict['Schnabel_div'].append(0)
+                    ret_dict['CAPTURE'].append(0)
+                else:
+                    estimated: dict = self.__estimate([c], [r])
+                    ret_dict['Petersen'].append(estimated['Petersen'])
+                    ret_dict['Schnabel_qul'].append(estimated['Schnabel_qul'])
+                    ret_dict['Schnabel_div'].append(estimated['Schnabel_div'])
+                    ret_dict['CAPTURE'].append(estimated['CAPTURE'])
             return ret_dict
         else:
             return self.__estimate(cand=cand, ref=ref)
